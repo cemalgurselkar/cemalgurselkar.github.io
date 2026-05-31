@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: #020617;
+  --surface-color: #0f172a;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --accent-color: #60a5fa;
+  --border-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='black'] {
+  --bg-color: #000000;
+  --surface-color: #111111;
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --accent-color: #ffffff;
+}
+
+[data-theme='white'] {
+  --bg-color: #ffffff;
+  --surface-color: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --accent-color: #1e40af;
+  /* Darker blue for light theme */
+  --border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='green'] {
+  --bg-color: #052e16;
+  --surface-color: #064e3b;
+  --text-primary: #ecfdf5;
+  --text-secondary: #6ee7b7;
+  --accent-color: #10b981;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    @apply antialiased transition-colors duration-300;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--text-primary) !important;
+    @apply font-bold;
+  }
+}
+
+/* Custom Overrides for Prose/Typography */
+.prose {
+  --tw-prose-body: var(--text-primary);
+  --tw-prose-headings: var(--text-primary);
+  --tw-prose-links: var(--accent-color);
+  --tw-prose-bold: var(--text-primary);
+  --tw-prose-counters: var(--text-secondary);
+  --tw-prose-bullets: var(--text-secondary);
+  --tw-prose-hr: var(--border-color);
+  --tw-prose-quotes: var(--text-primary);
+  --tw-prose-quote-borders: var(--accent-color);
+  --tw-prose-captions: var(--text-secondary);
+  --tw-prose-code: var(--accent-color);
+  --tw-prose-pre-code: var(--text-primary);
+  --tw-prose-pre-bg: transparent;
+  /* Make code blocks transparent as requested */
+  --tw-prose-th-borders: var(--border-color);
+  --tw-prose-td-borders: var(--border-color);
+}
+
+.prose pre {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid var(--border-color);
+}
+
+[data-theme='white'] .prose pre {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Page Transition Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s ease-out;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.4s ease-out;
+}
+
+/* Staggered animations for cards */
+.animate-stagger>* {
+  animation: slideUp 0.4s ease-out both;
+}
+
+.animate-stagger>*:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.animate-stagger>*:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.animate-stagger>*:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.animate-stagger>*:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.animate-stagger>*:nth-child(5) {
+  animation-delay: 0.25s;
+}
