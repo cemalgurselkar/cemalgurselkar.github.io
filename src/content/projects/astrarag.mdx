@@ -1,0 +1,9 @@
+## System in brief
+
+AstraRAG parses PDFs, creates token-based chunks, builds local embeddings, and stores vectors in Qdrant. A query can follow BM25, dense, reciprocal-rank-fusion hybrid, or routed retrieval before context reaches answer generation.
+
+## Practical limits
+
+- OCR and complex table or page-layout extraction are unsupported.
+- The documented `astrarag evaluate` command is a placeholder; benchmark scripts are the real evaluation path.
+- Retrieval latency is local and hardware-dependent, not a universal production claim.

@@ -1,0 +1,8 @@
+.next
+.next-generated
+coverage
+node_modules
+out
+plan.md
+playwright-report
+test-results

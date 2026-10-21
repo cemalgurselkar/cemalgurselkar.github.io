@@ -1,0 +1,9 @@
+## System in brief
+
+MarketStream separates exchange ingestion, Kafka buffering, PySpark processing, layered storage, orchestration, and serving. That separation makes producer rate, durable writer rate, queue growth, and consumer latency independently visible.
+
+## Practical limits
+
+- Requested event rate is not sustained throughput.
+- The recorded 50,000 events/s request exceeded the durable writer rate and accumulated backlog.
+- Results describe a captured environment, not guaranteed live-market performance.
