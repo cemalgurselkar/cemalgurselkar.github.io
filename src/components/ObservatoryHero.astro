@@ -3,36 +3,53 @@ import "@fontsource-variable/pixelify-sans";
 import { Picture } from "astro:assets";
 import observatory from "../assets/observatory-night.png";
 import { siteConfig } from "../config/site.config";
+import StarField from "./observatory/StarField.astro";
+import AmbientEffects from "./observatory/AmbientEffects.astro";
+import MonitorAnimation from "./observatory/MonitorAnimation.astro";
+import SceneHotspot from "./observatory/SceneHotspot.astro";
+import TelescopeView from "./observatory/TelescopeView.astro";
+import InteractiveTerminal from "./observatory/InteractiveTerminal.astro";
+import Eyepiece from "./observatory/Eyepiece.astro";
 
 /*
- * Full-width, full-height hero (100svh).
+ * Full-width, full-height living observatory hero (100svh).
  *
- * The image is `object-fit: cover`, so some of it is always cropped; which part is set by
- * --hero-pos (desktop / landscape) and --hero-pos-mobile (portrait). Source image: 1672×941.
- * Landmarks in the source, as fractions of width/height:
- *   galaxy   x 0.65–0.88, y 0.07–0.32     monitor x 0.33–0.53, y 0.60–0.77
- *   cat      x 0.62–0.74, y 0.75–0.84     telescope x 0.84–0.96, y 0.44–0.76
- * On very wide or very tall screens not everything can stay visible; the defaults keep the
- * desk and as much of the galaxy as the screen ratio allows.
+ * Alignment model — the "stage":
+ *   The hero is a size container. Each .hero-stage box is computed in CSS to be exactly the
+ *   size and position that `object-fit: cover` + `object-position` would give the image
+ *   (using cq units), and the image fills it 1:1. Every overlay is placed inside a stage in
+ *   percentages of the source image (src/lib/observatory-map.ts), so stars, steam, monitor
+ *   effects and the clickable monitor stay glued to the artwork at any viewport size or crop.
  *
- * Future overlays (phase E: stars, monitor, steam) must use the same object-position, so they
- * stay aligned with the crop.
+ * Crop controls (fractions, like object-position):
+ *   --hero-px / --hero-py            landscape & desktop
+ *   portrait screens override them below.
+ *
+ * Layers (bottom → top): artwork + ambient + telescope view (aria-hidden) → shade → title →
+ * interactive stage (monitor → terminal, telescope → eyepiece). Clicking the sky zooms in
+ * and opens the eyepiece too (src/scripts/telescope.ts).
  */
 ---
 
-<section class="hero" aria-labelledby="hero-title">
-  <Picture
-    src={observatory}
-    alt=""
-    formats={["avif", "webp"]}
-    widths={[640, 960, 1280, 1672]}
-    sizes="100vw"
-    quality={85}
-    loading="eager"
-    fetchpriority="high"
-    decoding="async"
-    class="hero-img"
-  />
+<section class="hero" aria-labelledby="hero-title" data-hero>
+  <div class="hero-stage stage-art" aria-hidden="true">
+    <Picture
+      src={observatory}
+      alt=""
+      formats={["avif", "webp"]}
+      widths={[640, 960, 1280, 1672]}
+      sizes="(max-aspect-ratio: 4/5) 178vh, 100vw"
+      quality={85}
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      class="hero-img"
+    />
+    <AmbientEffects />
+    <StarField />
+    <MonitorAnimation />
+    <TelescopeView />
+  </div>
 
   <!-- Local darkening behind the title, plus the fade into the page background. -->
   <div class="hero-shade" aria-hidden="true"></div>
@@ -44,10 +61,37 @@ import { siteConfig } from "../config/site.config";
     <p class="hero-role">{siteConfig.role}</p>
   </div>
 
+  <!-- Same geometry as the art stage, but interactive (not aria-hidden). -->
+  <div class="hero-stage stage-ui">
+    <SceneHotspot
+      region="monitor"
+      label="Open terminal"
+      tooltip="> Open Terminal"
+      data-terminal-open
+      aria-haspopup="dialog"
+      aria-controls="terminal"
+    />
+    <SceneHotspot
+      region="telescopeHit"
+      label="Look through the telescope"
+      tooltip="> Observe the sky"
+      class="tooltip-left"
+      data-telescope
+      aria-haspopup="dialog"
+      aria-controls="eyepiece"
+    />
+  </div>
+
   <a href="#about" class="scroll-cue">
     <span class="sr-only">Scroll to About me</span>
     <!-- Pixel-art down arrow -->
-    <svg viewBox="0 0 7 8" width="21" height="24" shape-rendering="crispEdges" aria-hidden="true">
+    <svg
+      viewBox="0 0 7 8"
+      width="21"
+      height="24"
+      shape-rendering="crispEdges"
+      aria-hidden="true"
+    >
       <rect x="3" y="0" width="1" height="6" fill="currentColor"></rect>
       <rect x="0" y="3" width="1" height="1" fill="currentColor"></rect>
       <rect x="1" y="4" width="1" height="1" fill="currentColor"></rect>
@@ -60,48 +104,127 @@ import { siteConfig } from "../config/site.config";
   </a>
 </section>
 
+<InteractiveTerminal />
+<Eyepiece />
+
+<script>
+  import { initObservatory } from "../scripts/observatory";
+  import { initTelescope } from "../scripts/telescope";
+  import { initTerminal } from "../scripts/terminal/terminal";
+
+  initObservatory();
+  initTerminal();
+  initTelescope();
+</script>
+
 <style>
   .hero {
-    /* Crop controls: adjust these to taste. */
-    --hero-pos: 50% 40%;
-    --hero-pos-mobile: 58% 50%;
+    /* Crop: which part of the artwork stays visible (0 = left/top, 1 = right/bottom). */
+    --hero-px: 0.5;
+    --hero-py: 0.4;
     /* Vertical position of the title block inside the sky. */
     --hero-title-top: 24%;
 
     position: relative;
     display: block;
     width: 100%; /* not 100vw: avoids horizontal overflow from the scrollbar */
-    min-height: 100vh; /* fallback */
-    min-height: 100svh;
+    /* An explicit height, not min-height: as a size container (below) the hero's cq units
+       come from its own size, and with only min-height Chromium resolved 100cqh to 0, which
+       shrank the stage to the width-only box and left the bottom of the hero empty. */
+    height: 100vh; /* fallback */
+    height: 100svh;
     overflow: hidden;
     background: var(--bg);
     isolation: isolate;
+    container-type: size;
   }
 
-  .hero :global(picture) {
+  /* Portrait screens: keep the monitor (the terminal's entry point) and the mug in view. */
+  @media (max-aspect-ratio: 4 / 5) {
+    .hero {
+      --hero-px: 0.43; /* monitor fully visible at 320–768px portrait */
+      --hero-py: 0.5;
+    }
+  }
+
+  /*
+   * "Cover" geometry for a 1672×941 image, in container units:
+   *   stage = max(container, container scaled to the image ratio), offset by --hero-px/py.
+   */
+  .hero-stage {
+    --stage-w: max(100cqw, 100cqh * 1672 / 941);
+    --stage-h: max(100cqh, 100cqw * 941 / 1672);
     position: absolute;
-    inset: 0;
-    z-index: -2;
+    left: calc((100cqw - var(--stage-w)) * var(--hero-px));
+    top: calc((100cqh - var(--stage-h)) * var(--hero-py));
+    width: var(--stage-w);
+    height: var(--stage-h);
   }
 
-  .hero :global(.hero-img) {
+  .stage-art {
+    z-index: 0;
+    pointer-events: none;
+    transform-origin: 0 0; /* the eyepiece zoom is computed from the top-left corner */
+  }
+
+  /* Clicking the sky zooms in (telescope.ts). */
+  .hero.is-aiming {
+    cursor: zoom-in;
+  }
+
+  /* While zoomed in: chunky pixels instead of a blurry upscale, and the UI steps aside. */
+  .hero.is-observing .stage-art :global(.hero-img) {
+    image-rendering: pixelated;
+  }
+
+  .hero-content,
+  .stage-ui,
+  .scroll-cue {
+    transition: filter 300ms ease;
+  }
+
+  /* filter (not opacity): .hero-content's opacity belongs to its scroll-driven fade. */
+  .hero.is-observing .hero-content,
+  .hero.is-observing .stage-ui,
+  .hero.is-observing .scroll-cue {
+    filter: opacity(0);
+    pointer-events: none;
+  }
+
+  .stage-art :global(picture),
+  .stage-art :global(.hero-img) {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: var(--hero-pos);
   }
 
-  @media (max-aspect-ratio: 4 / 5) {
-    .hero :global(.hero-img) {
-      object-position: var(--hero-pos-mobile);
-    }
+  .stage-art :global(.hero-img) {
+    object-fit: cover;
+  }
+
+  /* Decorative layers that drift with the pointer (≤ 4px; set by observatory.ts). */
+  .stage-art :global(.parallax) {
+    translate: calc(var(--plx-x, 0px) * var(--depth, 1))
+      calc(var(--plx-y, 0px) * var(--depth, 1));
+    transition: translate 600ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  /* Off-screen, hidden tab or motion off: freeze every ambient animation. */
+  .hero.is-idle .stage-art :global(*),
+  .hero.is-idle .stage-art :global(*::before),
+  .hero.is-idle .stage-art :global(*::after) {
+    animation-play-state: paused !important;
+  }
+
+  .stage-ui {
+    z-index: 3;
+    pointer-events: none; /* only the hotspot itself is clickable */
   }
 
   .hero-shade {
     position: absolute;
     inset: 0;
-    z-index: -1;
+    z-index: 1;
     pointer-events: none;
     background:
       /* soft local darkening behind the title for contrast */
@@ -118,11 +241,13 @@ import { siteConfig } from "../config/site.config";
 
   .hero-content {
     position: absolute;
+    z-index: 2;
     top: var(--hero-title-top);
     left: 50%;
     width: min(var(--content-max), calc(100% - 2 * var(--gutter)));
     translate: -50% 0;
     text-align: center;
+    pointer-events: none;
   }
 
   .hero-title {
@@ -137,6 +262,7 @@ import { siteConfig } from "../config/site.config";
       0 2px 0 rgb(15 16 28 / 0.65),
       0 0 24px rgb(15 16 28 / 0.6);
     text-wrap: balance;
+    pointer-events: auto;
   }
 
   .name {
@@ -150,10 +276,12 @@ import { siteConfig } from "../config/site.config";
     letter-spacing: 0.04em;
     color: var(--warm);
     text-shadow: 0 1px 8px rgb(15 16 28 / 0.8);
+    pointer-events: auto;
   }
 
   .scroll-cue {
     position: absolute;
+    z-index: 3;
     bottom: max(20px, 4svh);
     left: 50%;
     translate: -50% 0;

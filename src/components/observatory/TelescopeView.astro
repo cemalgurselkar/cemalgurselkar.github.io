@@ -1,0 +1,109 @@
+---
+/**
+ * The telescope's "aim" (decorative, lives in the aria-hidden art stage): a faint viewfinder
+ * that follows the mouse around the sky, with a dashed sight line back to the painted lens —
+ * the painted tube itself can't rotate (no sprite). Clicking the sky zooms in and opens the
+ * eyepiece (Eyepiece.astro). Behaviour: src/scripts/telescope.ts.
+ */
+import { ART, TELESCOPE_LENS, TELESCOPE_REST } from "../../lib/observatory-map";
+---
+
+<!-- Sight line from the painted lens to the viewfinder (source-pixel coordinates). -->
+<svg
+  class="sight"
+  viewBox={`0 0 ${ART.width} ${ART.height}`}
+  preserveAspectRatio="none"
+  aria-hidden="true"
+>
+  <line
+    data-sight-line
+    x1={TELESCOPE_LENS.x}
+    y1={TELESCOPE_LENS.y}
+    x2={TELESCOPE_REST.x}
+    y2={TELESCOPE_REST.y}
+  />
+</svg>
+
+<div class="viewfinder" data-viewfinder aria-hidden="true">
+  <i class="tick n"></i>
+  <i class="tick e"></i>
+  <i class="tick s"></i>
+  <i class="tick w"></i>
+</div>
+
+<style>
+  /* --- viewfinder ------------------------------------------------------- */
+
+  .sight {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 500ms ease;
+  }
+
+  .sight line {
+    stroke: var(--accent);
+    stroke-width: 1;
+    stroke-dasharray: 3 6;
+    stroke-opacity: 0.35;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .viewfinder {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5.2%; /* ≈ 87 source px */
+    aspect-ratio: 1;
+    border: 1px solid rgb(180 164 222 / 0.45);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgb(214 200 255 / 0.1),
+      rgb(214 200 255 / 0) 70%
+    );
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 500ms ease;
+    will-change: transform;
+  }
+
+  .tick {
+    position: absolute;
+    width: 6%;
+    aspect-ratio: 1;
+    background: rgb(180 164 222 / 0.7);
+  }
+  .tick.n {
+    top: 6%;
+    left: 47%;
+  }
+  .tick.s {
+    bottom: 6%;
+    left: 47%;
+  }
+  .tick.e {
+    right: 6%;
+    top: 47%;
+  }
+  .tick.w {
+    left: 6%;
+    top: 47%;
+  }
+
+  :global(.hero.is-watching) .viewfinder,
+  :global(.hero.is-watching) .sight {
+    opacity: 1;
+  }
+
+  /* Looking through the eyepiece: the reticle fades as the zoom starts. */
+  :global(.hero.is-observing) .viewfinder,
+  :global(.hero.is-observing) .sight {
+    opacity: 0;
+    transition-duration: 250ms;
+  }
+</style>

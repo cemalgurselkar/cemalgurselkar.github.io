@@ -5,15 +5,13 @@ import { siteConfig } from "../config/site.config";
 const topic = siteConfig.currentFocus[0];
 ---
 
-{
-  topic && (
-    <p class="focus">
-      <span class="dot" aria-hidden="true" />
-      <span class="label">Currently exploring</span>
-      <span class="topic">{topic}</span>
-    </p>
-  )
-}
+{topic && (
+  <p class="focus">
+    <span class="dot" aria-hidden="true" />
+    <span class="label">Currently exploring</span>
+    <span class="topic">{topic}</span>
+  </p>
+)}
 
 <style>
   .focus {

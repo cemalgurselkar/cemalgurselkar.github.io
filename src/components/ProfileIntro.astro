@@ -7,40 +7,60 @@ import { withBase } from "../lib/paths";
 // The page H1 lives in the hero; this section starts at H2.
 // Only links with real values are rendered.
 const links = [
-  siteConfig.resumePath && { label: "CV", href: withBase(siteConfig.resumePath), external: true },
-  siteConfig.githubUrl && { label: "GitHub", href: siteConfig.githubUrl, external: true },
-  siteConfig.linkedinUrl && { label: "LinkedIn", href: siteConfig.linkedinUrl, external: true },
-  siteConfig.email && { label: "Email", href: `mailto:${siteConfig.email}`, external: false },
-].filter((link): link is { label: string; href: string; external: boolean } => Boolean(link));
+  siteConfig.resumePath && {
+    label: "CV",
+    href: withBase(siteConfig.resumePath),
+    external: true,
+  },
+  siteConfig.githubUrl && {
+    label: "GitHub",
+    href: siteConfig.githubUrl,
+    external: true,
+  },
+  siteConfig.linkedinUrl && {
+    label: "LinkedIn",
+    href: siteConfig.linkedinUrl,
+    external: true,
+  },
+  siteConfig.email && {
+    label: "Email",
+    href: `mailto:${siteConfig.email}`,
+    external: false,
+  },
+].filter((link): link is { label: string; href: string; external: boolean } =>
+  Boolean(link),
+);
 ---
 
 <section id="about" class="about" aria-labelledby="about-title" data-reveal>
-  <h2 id="about-title" class="section-title">About me</h2>
+  <h2 id="about-title" class="section-title">
+    About me
+  </h2>
   <p class="tagline">{siteConfig.tagline}</p>
   <p class="bio">{siteConfig.bio}</p>
 
-  {
-    links.length > 0 && (
-      <ul class="links">
-        {links.map((link) => (
-          <li>
-            <a
-              href={link.href}
-              {...(link.external ? { target: "_blank", rel: "me noopener noreferrer" } : {})}
-            >
-              {link.label}
-              {link.external && (
-                <>
-                  <Icon name="arrow-up-right" size={14} />
-                  <span class="sr-only"> (opens in a new tab)</span>
-                </>
-              )}
-            </a>
-          </li>
-        ))}
-      </ul>
-    )
-  }
+  {links.length > 0 && (
+    <ul class="links">
+      {links.map((link) => (
+        <li>
+          <a
+            href={link.href}
+            {...(link.external
+              ? { target: "_blank", rel: "me noopener noreferrer" }
+              : {})}
+          >
+            {link.label}
+            {link.external && (
+              <>
+                <Icon name="arrow-up-right" size={14} />
+                <span class="sr-only"> (opens in a new tab)</span>
+              </>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
 
   <CurrentFocus />
 </section>

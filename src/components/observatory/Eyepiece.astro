@@ -1,0 +1,306 @@
+---
+/**
+ * Telescope eyepiece modal: a round lens (pixel-art canvas, painted in code) and an info card.
+ * Content is filled in by src/scripts/eyepiece/eyepiece.ts from src/lib/sky-catalog.ts.
+ */
+import { RES } from "../../scripts/eyepiece/render";
+---
+
+<dialog
+  id="eyepiece"
+  class="eyepiece"
+  aria-labelledby="eyepiece-title"
+  aria-describedby="eyepiece-desc"
+  data-eyepiece
+>
+  <div class="layout">
+    <div class="lens" data-eyepiece-lens>
+      <canvas
+        width={RES}
+        height={RES}
+        role="img"
+        aria-label=""
+        data-eyepiece-canvas
+      ></canvas>
+      <span class="reticle" aria-hidden="true"></span>
+    </div>
+
+    <section class="card" data-eyepiece-card>
+      <p class="kind" data-eyepiece-kind></p>
+      <h2 id="eyepiece-title" class="name" data-eyepiece-name></h2>
+      <dl class="facts" data-eyepiece-facts></dl>
+      <p id="eyepiece-desc" class="desc" data-eyepiece-desc></p>
+      <p class="note" data-eyepiece-note hidden></p>
+      <div class="actions">
+        <a
+          class="action"
+          data-eyepiece-link
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read more on Wikipedia
+          <span class="sr-only"> (opens in a new tab)</span>
+        </a>
+        <button type="button" class="action" data-eyepiece-next>
+          Point elsewhere
+        </button>
+      </div>
+      <p class="sr-only" aria-live="polite" data-eyepiece-live></p>
+    </section>
+  </div>
+
+  <button
+    type="button"
+    class="close"
+    data-eyepiece-close
+    aria-label="Close telescope view"
+  >
+    <svg
+      viewBox="0 0 7 7"
+      width="14"
+      height="14"
+      shape-rendering="crispEdges"
+      aria-hidden="true"
+    >
+      <path
+        d="M0 0h1v1H0zM1 1h1v1H1zM2 2h1v1H2zM3 3h1v1H3zM4 4h1v1H4zM5 5h1v1H5zM6 6h1v1H6zM6 0h1v1H6zM5 1h1v1H5zM4 2h1v1H4zM2 4h1v1H2zM1 5h1v1H1zM0 6h1v1H0z"
+        fill="currentColor"
+      ></path>
+    </svg>
+  </button>
+</dialog>
+
+<style>
+  .eyepiece {
+    --lens: min(72vmin, 460px);
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 64px 16px 32px;
+    display: none;
+    color: var(--text);
+    background: transparent;
+    border: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .eyepiece[open] {
+    display: flex;
+  }
+
+  .eyepiece::backdrop {
+    background: radial-gradient(
+      circle at 50% 50%,
+      rgb(4 5 12 / 0.6),
+      rgb(4 5 12 / 0.94) 70%
+    );
+    animation: backdrop-in 450ms ease-out;
+  }
+
+  @keyframes backdrop-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  :global(:root[data-motion="off"]) .eyepiece::backdrop {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .eyepiece::backdrop {
+      animation: none;
+    }
+  }
+
+  .layout {
+    margin: auto; /* centred, but still scrollable when taller than the screen */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(24px, 4vw, 56px);
+    max-width: 1040px;
+  }
+
+  /* ---- lens ---- */
+
+  .lens {
+    position: relative;
+    flex-shrink: 0;
+    width: var(--lens);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #04050d;
+    box-shadow:
+      0 0 0 10px #161829,
+      0 0 0 12px color-mix(in srgb, var(--accent) 45%, #161829),
+      0 0 0 13px #0b0c18,
+      0 0 90px rgb(180 164 222 / 0.16);
+  }
+
+  .lens canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+
+  /* Dark falloff at the edge of the eyepiece. */
+  .lens::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      transparent 56%,
+      rgb(4 5 12 / 0.5) 80%,
+      rgb(4 5 12 / 0.95) 100%
+    );
+    pointer-events: none;
+  }
+
+  /* Faint crosshair with an open centre. */
+  .reticle {
+    position: absolute;
+    inset: 0;
+    opacity: 0.22;
+    background:
+      linear-gradient(var(--accent), var(--accent)) center / 1px 100% no-repeat,
+      linear-gradient(var(--accent), var(--accent)) center / 100% 1px no-repeat;
+    mask: radial-gradient(
+      circle,
+      transparent 0 14%,
+      #000 14.5% 46%,
+      transparent 46.5%
+    );
+    pointer-events: none;
+  }
+
+  /* ---- card ---- */
+
+  .card {
+    width: min(380px, 100%);
+    padding: 20px 22px 22px;
+    background: var(--surface);
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+    box-shadow: 4px 4px 0 rgb(5 6 14 / 0.7);
+  }
+
+  .kind {
+    margin: 0;
+    font-family: var(--font-pixel);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm);
+  }
+
+  .name {
+    margin: 6px 0 14px;
+    font-family: var(--font-pixel);
+    font-weight: 500;
+    font-size: clamp(24px, 3vw, 32px);
+    line-height: 1.1;
+    color: var(--accent);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 16px;
+    margin: 0 0 14px;
+    font-family: var(--font-code);
+    font-size: 13px;
+  }
+
+  .facts :global(dt) {
+    color: var(--muted);
+  }
+
+  .facts :global(dd) {
+    margin: 0;
+  }
+
+  .desc {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .note {
+    margin: 10px 0 0;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .action {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 12px;
+    font-family: var(--font-pixel);
+    font-size: 14px;
+    color: var(--text);
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--border));
+    cursor: pointer;
+    transition:
+      background-color var(--ease),
+      color var(--ease);
+  }
+
+  .action:hover,
+  .action:focus-visible {
+    color: var(--bg);
+    background: var(--accent);
+    outline: none;
+  }
+
+  .action[hidden] {
+    display: none;
+  }
+
+  .close {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .close:hover,
+  .close:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  @media (max-width: 640px) {
+    .eyepiece {
+      --lens: min(84vw, 46svh);
+    }
+  }
+</style>

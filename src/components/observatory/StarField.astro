@@ -1,0 +1,127 @@
+---
+/**
+ * Pixel stars over the visible sky, plus the (JS-driven) shooting star.
+ * Positions/opacity/timing are randomised at build time with a fixed seed: they look random,
+ * but every build is identical (no layout shift, stable screenshots).
+ * Without JS the stars still twinkle (pure CSS); only the shooting star needs JS.
+ */
+import {
+  inRect,
+  isSky,
+  px,
+  py,
+  REGIONS,
+  seededRandom,
+} from "../../lib/observatory-map";
+
+const STAR_COUNT = 26;
+const random = seededRandom(1672941);
+
+interface Star {
+  x: number;
+  y: number;
+  size: number;
+  lo: number;
+  hi: number;
+  duration: number;
+  delay: number;
+  tone: "white" | "lavender" | "warm";
+}
+
+const stars: Star[] = [];
+let guard = 0;
+while (stars.length < STAR_COUNT && guard++ < 5000) {
+  const x = 400 + random() * 1250;
+  const y = 8 + random() * 520;
+  if (!isSky(x, y)) continue;
+  // Keep clear of the painted shooting star, and don't crowd other stars.
+  if (inRect(x, y, REGIONS.paintedShootingStar, 10)) continue;
+  if (stars.some((s) => Math.hypot(s.x - x, s.y - y) < 55)) continue;
+  const roll = random();
+  stars.push({
+    x,
+    y,
+    size: random() < 0.2 ? 5 : 3, // source px; the artwork's own "pixels" are ~3–4 px
+    lo: 0.12 + random() * 0.25,
+    hi: 0.55 + random() * 0.4,
+    duration: 3 + random() * 5,
+    delay: -random() * 8,
+    tone: roll < 0.7 ? "white" : roll < 0.92 ? "lavender" : "warm",
+  });
+}
+---
+
+<div class="star-field parallax" style="--depth: 1" aria-hidden="true">
+  {stars.map((s) => (
+    <span
+      class:list={["star", s.tone]}
+      style={`left:${px(s.x)};top:${py(s.y)};width:${px(s.size)};--lo:${s.lo.toFixed(2)};--hi:${s.hi.toFixed(2)};--d:${s.duration.toFixed(1)}s;--delay:${s.delay.toFixed(1)}s`}
+    />
+  ))}
+  <!-- Positioned and animated by src/scripts/observatory.ts every 15–40 s. -->
+  <span class="shooting-star" data-shooting-star>
+    <span class="trail"></span>
+  </span>
+</div>
+
+<style>
+  .star-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .star {
+    position: absolute;
+    aspect-ratio: 1;
+    background: #f2f0fa;
+    opacity: var(--lo);
+    animation: twinkle var(--d) ease-in-out var(--delay) infinite alternate;
+  }
+
+  .star.lavender {
+    background: var(--accent);
+  }
+
+  .star.warm {
+    background: var(--warm);
+  }
+
+  @keyframes twinkle {
+    to {
+      opacity: var(--hi);
+    }
+  }
+
+  .shooting-star {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6%;
+    height: max(1px, 0.22%);
+    opacity: 0;
+    transform-origin: 100% 50%;
+  }
+
+  .trail {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgb(242 240 250 / 0),
+      rgb(242 240 250 / 0.9)
+    );
+  }
+
+  /* Pixel "head" */
+  .trail::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    height: 220%;
+    aspect-ratio: 1;
+    translate: 0 -50%;
+    background: #fff;
+  }
+</style>

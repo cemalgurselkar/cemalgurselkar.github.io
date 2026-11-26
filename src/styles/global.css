@@ -187,14 +187,18 @@ main {
   transition-delay: calc(var(--reveal-i, 0) * 60ms);
 }
 
-.motion-ready [data-reveal].is-visible,
-/* Anything receiving focus is shown at once (keyboard users never land on hidden content). */
-.motion-ready [data-reveal]:focus-within {
+.motion-ready [data-reveal].is-visible {
   opacity: 1;
   translate: 0 0;
 }
 
-.motion-ready [data-reveal]:focus-within {
+/* Keyboard focus shows the element at once (keyboard users never land on hidden content).
+   :focus-visible, not :focus-within: a mouse press also focuses a link, and snapping the
+   element 12px up between mousedown and mouseup made clicks during the reveal miss the link.
+   Kept as its own rule so a browser without :has() still applies the one above. */
+.motion-ready [data-reveal]:has(:focus-visible) {
+  opacity: 1;
+  translate: 0 0;
   transition: none;
 }
 

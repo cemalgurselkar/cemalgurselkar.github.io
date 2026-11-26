@@ -18,21 +18,23 @@ const links = navigation.map((item) => ({
 ---
 
 <header class:list={["site-container header", { overlay }]}>
-  <a href={withBase("/")} class="wordmark" aria-label={`${siteConfig.name}, home`}>
+  <a
+    href={withBase("/")}
+    class="wordmark"
+    aria-label={`${siteConfig.name}, home`}
+  >
     {siteConfig.wordmark}
   </a>
 
   <nav aria-label="Main" class="nav-desktop">
     <ul>
-      {
-        links.map((link) => (
-          <li>
-            <a href={link.url} aria-current={link.active ? "page" : undefined}>
-              {link.label}
-            </a>
-          </li>
-        ))
-      }
+      {links.map((link) => (
+        <li>
+          <a href={link.url} aria-current={link.active ? "page" : undefined}>
+            {link.label}
+          </a>
+        </li>
+      ))}
     </ul>
   </nav>
 
@@ -43,15 +45,13 @@ const links = navigation.map((item) => ({
     </summary>
     <nav aria-label="Main (mobile)">
       <ul>
-        {
-          links.map((link) => (
-            <li>
-              <a href={link.url} aria-current={link.active ? "page" : undefined}>
-                {link.label}
-              </a>
-            </li>
-          ))
-        }
+        {links.map((link) => (
+          <li>
+            <a href={link.url} aria-current={link.active ? "page" : undefined}>
+              {link.label}
+            </a>
+          </li>
+        ))}
       </ul>
     </nav>
   </details>

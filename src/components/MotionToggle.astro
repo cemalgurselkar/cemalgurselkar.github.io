@@ -2,16 +2,25 @@
 // Hidden until JS runs: without JS there is no motion to turn off.
 ---
 
-<button type="button" class="motion-toggle" data-motion-toggle hidden aria-pressed="false">
+<button
+  type="button"
+  class="motion-toggle"
+  data-motion-toggle
+  hidden
+  aria-pressed="false"
+>
   Reduce motion
 </button>
 
 <script>
   import { isMotionOn, setMotion } from "../scripts/scroll-motion";
 
-  const button = document.querySelector<HTMLButtonElement>("[data-motion-toggle]");
+  const button = document.querySelector<HTMLButtonElement>(
+    "[data-motion-toggle]",
+  );
   if (button) {
-    const sync = () => button.setAttribute("aria-pressed", String(!isMotionOn()));
+    const sync = () =>
+      button.setAttribute("aria-pressed", String(!isMotionOn()));
     sync();
     button.hidden = false;
     button.addEventListener("click", () => {

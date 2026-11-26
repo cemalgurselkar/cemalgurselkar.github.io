@@ -1,7 +1,8 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
 /** Drafts are visible in `astro dev`, never in production builds (no list entry, no route). */
-const isPublic = ({ data }: { data: { draft: boolean } }) => import.meta.env.DEV || !data.draft;
+const isPublic = ({ data }: { data: { draft: boolean } }) =>
+  import.meta.env.DEV || !data.draft;
 
 /** Medium articles, newest first. Links always point at the original article. */
 export async function getArticles(): Promise<CollectionEntry<"articles">[]> {

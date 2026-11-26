@@ -23,7 +23,9 @@ const articles = defineCollection({
     const result = useFixtures
       ? await loadMediumArticles({
           feedXml: await readFile("tests/fixtures/medium/feed.xml", "utf8"),
-          archive: JSON.parse(await readFile("tests/fixtures/medium/archive.json", "utf8")),
+          archive: JSON.parse(
+            await readFile("tests/fixtures/medium/archive.json", "utf8"),
+          ),
           allowedHosts: ["blog.example-publication.com"],
         })
       : await loadMediumArticles({
@@ -33,7 +35,9 @@ const articles = defineCollection({
         });
 
     if (result.warning) console.warn(`[medium] ${result.warning}`);
-    console.info(`[medium] ${result.articles.length} article(s), source: ${result.source}`);
+    console.info(
+      `[medium] ${result.articles.length} article(s), source: ${result.source}`,
+    );
 
     return result.articles.map((article) => ({
       id: article.url,
@@ -66,7 +70,9 @@ const projects = defineCollection({
     status: z.enum(["active", "complete", "archived"]).optional(),
     draft: z.boolean().default(false),
     /** Extra links shown on the detail page (README, benchmarks, demo, ...). */
-    links: z.array(z.object({ label: z.string().min(1), url: z.url() })).default([]),
+    links: z
+      .array(z.object({ label: z.string().min(1), url: z.url() }))
+      .default([]),
   }),
 });
 

@@ -21,24 +21,26 @@ const repoUrl = repo ? `https://github.com/${repo}` : undefined;
     <Heading class="title">
       <a href={withBase(`/projects/${project.id}`)}>{title}</a>
     </Heading>
-    {
-      repoUrl && (
-        <a class="repo" href={repoUrl} target="_blank" rel="noopener" aria-label={`${title} on GitHub`}>
-          <Icon name="github" size={18} />
-        </a>
-      )
-    }
+    {repoUrl && (
+      <a
+        class="repo"
+        href={repoUrl}
+        target="_blank"
+        rel="noopener"
+        aria-label={`${title} on GitHub`}
+      >
+        <Icon name="github" size={18} />
+      </a>
+    )}
   </div>
   <p class="desc">{description}</p>
-  {
-    technologies.length > 0 && (
-      <ul class="tech" aria-label="Technologies">
-        {technologies.map((tech) => (
-          <li>{tech}</li>
-        ))}
-      </ul>
-    )
-  }
+  {technologies.length > 0 && (
+    <ul class="tech" aria-label="Technologies">
+      {technologies.map((tech) => (
+        <li>{tech}</li>
+      ))}
+    </ul>
+  )}
 </article>
 
 <style>

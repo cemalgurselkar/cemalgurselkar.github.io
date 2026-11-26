@@ -5,7 +5,13 @@ import globals from "globals";
 
 export default [
   {
-    ignores: ["dist/", ".astro/", "node_modules/", "playwright-report/", "test-results/"],
+    ignores: [
+      "dist/",
+      ".astro/",
+      "node_modules/",
+      "playwright-report/",
+      "test-results/",
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

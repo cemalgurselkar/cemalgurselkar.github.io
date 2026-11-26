@@ -33,7 +33,10 @@ const DEFAULT_TIMEOUT_MS = 8_000;
 // ---------------------------------------------------------------------------
 
 /** HTTPS only, and the host must be medium.com, *.medium.com, or a host the user approved. */
-export function isAllowedUrl(raw: string, extraHosts: readonly string[] = []): boolean {
+export function isAllowedUrl(
+  raw: string,
+  extraHosts: readonly string[] = [],
+): boolean {
   let url: URL;
   try {
     url = new URL(raw);
@@ -75,13 +78,21 @@ const NAMED_ENTITIES: Record<string, string> = {
 };
 
 function decodeEntities(text: string): string {
-  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, code: string) => {
-    if (code[0] === "#") {
-      const n = code[1]?.toLowerCase() === "x" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
-      return Number.isFinite(n) && n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : "";
-    }
-    return NAMED_ENTITIES[code.toLowerCase()] ?? match;
-  });
+  return text.replace(
+    /&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,
+    (match, code: string) => {
+      if (code[0] === "#") {
+        const n =
+          code[1]?.toLowerCase() === "x"
+            ? parseInt(code.slice(2), 16)
+            : parseInt(code.slice(1), 10);
+        return Number.isFinite(n) && n > 0 && n <= 0x10ffff
+          ? String.fromCodePoint(n)
+          : "";
+      }
+      return NAMED_ENTITIES[code.toLowerCase()] ?? match;
+    },
+  );
 }
 
 /** Reduce any HTML fragment to collapsed plain text. Scripts and styles are dropped with their content. */
@@ -90,7 +101,10 @@ export function toPlainText(html: string): string {
     .replace(/<(script|style|iframe|noscript)\b[\s\S]*?<\/\1\s*>/gi, " ")
     .replace(/<!--[\s\S]*?-->/g, " ");
   const withoutTags = withoutBlocks.replace(/<[^>]*>/g, " ");
-  return decodeEntities(withoutTags).replace(/[<>]/g, "").replace(/\s+/g, " ").trim();
+  return decodeEntities(withoutTags)
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function truncate(text: string, max = DESCRIPTION_MAX): string {
@@ -114,7 +128,9 @@ function asText(value: unknown): string {
 }
 
 function cleanTags(values: unknown[]): string[] {
-  const tags = values.map((v) => toPlainText(asText(v))).filter((t) => t.length > 0 && t.length <= 40);
+  const tags = values
+    .map((v) => toPlainText(asText(v)))
+    .filter((t) => t.length > 0 && t.length <= 40);
   return [...new Set(tags)].slice(0, MAX_TAGS);
 }
 
@@ -130,13 +146,23 @@ interface RawArticle {
   tags?: unknown;
 }
 
-function normalizeArticle(raw: RawArticle, allowedHosts: readonly string[]): MediumArticle | null {
+function normalizeArticle(
+  raw: RawArticle,
+  allowedHosts: readonly string[],
+): MediumArticle | null {
   const title = toPlainText(asText(raw.title));
   const url = asText(raw.url).trim();
   const date = new Date(asText(raw.publishedAt));
-  if (!title || !isAllowedUrl(url, allowedHosts) || Number.isNaN(date.valueOf())) return null;
+  if (
+    !title ||
+    !isAllowedUrl(url, allowedHosts) ||
+    Number.isNaN(date.valueOf())
+  )
+    return null;
 
-  const description = raw.description ? truncate(toPlainText(asText(raw.description))) : undefined;
+  const description = raw.description
+    ? truncate(toPlainText(asText(raw.description)))
+    : undefined;
   return {
     title: truncate(title, 200),
     url: normalizeUrl(url),
@@ -151,7 +177,10 @@ function normalizeArticle(raw: RawArticle, allowedHosts: readonly string[]): Med
 // ---------------------------------------------------------------------------
 
 /** Parse a Medium RSS 2.0 feed. Throws on malformed XML so the caller can fall back. */
-export function parseMediumFeed(xml: string, allowedHosts: readonly string[] = []): MediumArticle[] {
+export function parseMediumFeed(
+  xml: string,
+  allowedHosts: readonly string[] = [],
+): MediumArticle[] {
   if (xml.length > MAX_FEED_BYTES) throw new Error("Feed is too large");
 
   const parser = new XMLParser({
@@ -173,7 +202,9 @@ export function parseMediumFeed(xml: string, allowedHosts: readonly string[] = [
   const articles: MediumArticle[] = [];
   for (const item of items) {
     const content = asText(item["content:encoded"]);
-    const description = asText(item.description) || (content ? excerptFromContent(content) : undefined);
+    const description =
+      asText(item.description) ||
+      (content ? excerptFromContent(content) : undefined);
     const article = normalizeArticle(
       {
         title: item.title,
@@ -190,10 +221,17 @@ export function parseMediumFeed(xml: string, allowedHosts: readonly string[] = [
 }
 
 /** Validate the user-maintained archive (src/data/medium-articles.json). Invalid rows are skipped. */
-export function parseArchive(data: unknown, allowedHosts: readonly string[] = []): MediumArticle[] {
+export function parseArchive(
+  data: unknown,
+  allowedHosts: readonly string[] = [],
+): MediumArticle[] {
   if (!Array.isArray(data)) return [];
   return data
-    .map((row) => (row && typeof row === "object" ? normalizeArticle(row as RawArticle, allowedHosts) : null))
+    .map((row) =>
+      row && typeof row === "object"
+        ? normalizeArticle(row as RawArticle, allowedHosts)
+        : null,
+    )
     .filter((a): a is MediumArticle => a !== null);
 }
 
@@ -205,7 +243,9 @@ export function mergeArticles(...lists: MediumArticle[][]): MediumArticle[] {
       if (!byUrl.has(article.url)) byUrl.set(article.url, article);
     }
   }
-  return [...byUrl.values()].sort((a, b) => b.publishedAt.valueOf() - a.publishedAt.valueOf());
+  return [...byUrl.values()].sort(
+    (a, b) => b.publishedAt.valueOf() - a.publishedAt.valueOf(),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -214,11 +254,16 @@ export function mergeArticles(...lists: MediumArticle[][]): MediumArticle[] {
 
 export async function fetchFeed(
   feedUrl: string,
-  { fetchImpl = fetch, timeoutMs = DEFAULT_TIMEOUT_MS }: { fetchImpl?: typeof fetch; timeoutMs?: number } = {},
+  {
+    fetchImpl = fetch,
+    timeoutMs = DEFAULT_TIMEOUT_MS,
+  }: { fetchImpl?: typeof fetch; timeoutMs?: number } = {},
 ): Promise<string> {
   const response = await fetchImpl(feedUrl, {
     signal: AbortSignal.timeout(timeoutMs),
-    headers: { Accept: "application/rss+xml, application/xml;q=0.9, text/xml;q=0.8" },
+    headers: {
+      Accept: "application/rss+xml, application/xml;q=0.9, text/xml;q=0.8",
+    },
     redirect: "follow",
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -242,7 +287,9 @@ export interface LoadOptions {
  * Never throws: any feed problem (timeout, HTTP error, bad XML, wrong host) falls back to the
  * local archive, and with no archive the result is an honest empty list.
  */
-export async function loadMediumArticles(options: LoadOptions): Promise<LoadResult> {
+export async function loadMediumArticles(
+  options: LoadOptions,
+): Promise<LoadResult> {
   const allowedHosts = options.allowedHosts ?? [];
   const archived = parseArchive(options.archive, allowedHosts);
 
@@ -251,16 +298,29 @@ export async function loadMediumArticles(options: LoadOptions): Promise<LoadResu
 
   if (options.feedXml !== undefined || options.feedUrl) {
     try {
-      if (options.feedUrl && options.feedXml === undefined && !isAllowedUrl(options.feedUrl, allowedHosts)) {
-        throw new Error("Feed URL must be HTTPS on medium.com or an approved host");
+      if (
+        options.feedUrl &&
+        options.feedXml === undefined &&
+        !isAllowedUrl(options.feedUrl, allowedHosts)
+      ) {
+        throw new Error(
+          "Feed URL must be HTTPS on medium.com or an approved host",
+        );
       }
       const xml =
         options.feedXml ??
-        (await fetchFeed(options.feedUrl!, { fetchImpl: options.fetchImpl, timeoutMs: options.timeoutMs }));
+        (await fetchFeed(options.feedUrl!, {
+          fetchImpl: options.fetchImpl,
+          timeoutMs: options.timeoutMs,
+        }));
       fromFeed = parseMediumFeed(xml, allowedHosts);
     } catch (error) {
       const reason =
-        error instanceof Error ? (error.name === "TimeoutError" ? "timed out" : error.message) : "unknown error";
+        error instanceof Error
+          ? error.name === "TimeoutError"
+            ? "timed out"
+            : error.message
+          : "unknown error";
       warning = `Medium feed unavailable (${reason}); using the local archive.`;
     }
   }

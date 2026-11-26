@@ -6,25 +6,25 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="site-container footer">
-  <p class="meta">© {year} {siteConfig.name}</p>
+  <p class="meta">
+    © {year} {siteConfig.name}
+  </p>
   <ul>
-    {
-      siteConfig.githubUrl && (
-        <li>
-          <a href={siteConfig.githubUrl} rel="me noopener" target="_blank">
-            GitHub
-          </a>
-        </li>
-      )
-    }
-    {
-      siteConfig.email && (
-        <li>
-          <a href={`mailto:${siteConfig.email}`}>Contact</a>
-        </li>
-      )
-    }
-    <li><MotionToggle /></li>
+    {siteConfig.githubUrl && (
+      <li>
+        <a href={siteConfig.githubUrl} rel="me noopener" target="_blank">
+          GitHub
+        </a>
+      </li>
+    )}
+    {siteConfig.email && (
+      <li>
+        <a href={`mailto:${siteConfig.email}`}>Contact</a>
+      </li>
+    )}
+    <li>
+      <MotionToggle />
+    </li>
   </ul>
 </footer>
 

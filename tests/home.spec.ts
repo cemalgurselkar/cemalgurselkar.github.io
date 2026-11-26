@@ -34,11 +34,15 @@ for (const viewport of viewports) {
       await page.goto("/");
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page.locator("h1")).toHaveText(/Hi! I'm Cemal Gürsel Kar/);
-      const font = await page.locator("h1").evaluate((el) => getComputedStyle(el).fontFamily);
+      const font = await page
+        .locator("h1")
+        .evaluate((el) => getComputedStyle(el).fontFamily);
       expect(font).toMatch(/Pixelify Sans/);
     });
 
-    test("content below the hero shares one container edge", async ({ page }) => {
+    test("content below the hero shares one container edge", async ({
+      page,
+    }) => {
       await page.goto("/");
       const left = async (selector: string) =>
         Math.round((await page.locator(selector).first().boundingBox())!.x);
@@ -51,28 +55,44 @@ for (const viewport of viewports) {
       await page.goto("/");
       if (viewport.width < 560) {
         await page.locator(".nav-mobile summary").click();
-        await expect(page.getByRole("navigation", { name: "Main (mobile)" })).toBeVisible();
+        await expect(
+          page.getByRole("navigation", { name: "Main (mobile)" }),
+        ).toBeVisible();
       } else {
-        await expect(page.getByRole("navigation", { name: "Main", exact: true })).toBeVisible();
+        await expect(
+          page.getByRole("navigation", { name: "Main", exact: true }),
+        ).toBeVisible();
       }
-      await expect(page.locator('a[aria-current="page"]').first()).toHaveText("Home");
+      await expect(page.locator('a[aria-current="page"]').first()).toHaveText(
+        "Home",
+      );
     });
 
     test("screenshot for manual review", async ({ page }, testInfo) => {
       await page.goto("/");
       // Reveal everything so the full-page screenshot shows final content.
       await page.evaluate(() =>
-        document.querySelectorAll("[data-reveal]").forEach((el) => el.classList.add("is-visible")),
+        document
+          .querySelectorAll("[data-reveal]")
+          .forEach((el) => el.classList.add("is-visible")),
       );
-      await page.screenshot({ path: testInfo.outputPath(`home-${viewport.width}.png`), fullPage: true });
+      await page.screenshot({
+        path: testInfo.outputPath(`home-${viewport.width}.png`),
+        fullPage: true,
+      });
     });
   });
 }
 
 test.describe("header", () => {
-  test("is transparent over the hero on home and solid elsewhere", async ({ page }) => {
+  test("is transparent over the hero on home and solid elsewhere", async ({
+    page,
+  }) => {
     await page.goto("/");
-    await expect(page.locator("header.overlay")).toHaveCSS("position", "absolute");
+    await expect(page.locator("header.overlay")).toHaveCSS(
+      "position",
+      "absolute",
+    );
     await page.goto("/projects");
     await expect(page.locator("header.overlay")).toHaveCount(0);
   });
@@ -102,7 +122,9 @@ test.describe("scroll and motion", () => {
     const link = page.locator(".card .title a").first();
     await link.focus();
     await expect(link).toBeVisible();
-    const opacity = await link.evaluate((el) => getComputedStyle(el.closest("[data-reveal]")!).opacity);
+    const opacity = await link.evaluate(
+      (el) => getComputedStyle(el.closest("[data-reveal]")!).opacity,
+    );
     expect(opacity).toBe("1");
   });
 
@@ -138,7 +160,9 @@ test.describe("without JavaScript", () => {
     for (const el of await page.locator("[data-reveal]").all()) {
       await expect(el).toHaveCSS("opacity", "1");
     }
-    await expect(page.getByRole("button", { name: "Reduce motion" })).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Reduce motion" }),
+    ).toBeHidden();
   });
 });
 

@@ -23,10 +23,10 @@ VecTorch is an embedded persistent vector-search baseline. NumPy-backed flat sea
 
 Audited at commit `8a88749`: 1M vectors, 128 dimensions, exact search, machine-specific local run.
 
-| Measure | Value |
-| --- | --- |
+| Measure     | Value      |
+| ----------- | ---------- |
 | p50 latency | 199.701 ms |
-| Throughput | 4.88 QPS |
+| Throughput  | 4.88 QPS   |
 
 ## Limitations
 

@@ -34,7 +34,7 @@ export interface SiteConfig {
 export const siteConfig: SiteConfig = {
   name: "Cemal Gürsel Kar",
   wordmark: "Cemal Gürsel Kar",
-  role: "Junior Software Engineer (about Ai/Data-driven system)",
+  role: "Junior Software Engineer (Ai/Data-driven system)",
   tagline: "Exploring computation, intelligence and complex systems.",
   bio: "I build AI and data systems that can be opened up, measured, and questioned — retrieval pipelines with evaluation, streaming infrastructure with visible boundaries, and robot workflows that keep language grounded in state.",
   locale: "en",

@@ -11,7 +11,9 @@ import { getArticles, getProjects } from "../lib/content";
 const MAX_FEATURED = 4;
 const RECENT_ARTICLES = 3;
 
-const featured = (await getProjects()).filter((p) => p.data.featured).slice(0, MAX_FEATURED);
+const featured = (await getProjects())
+  .filter((p) => p.data.featured)
+  .slice(0, MAX_FEATURED);
 const recentArticles = (await getArticles()).slice(0, RECENT_ARTICLES);
 ---
 
@@ -23,31 +25,33 @@ const recentArticles = (await getArticles()).slice(0, RECENT_ARTICLES);
 
     <section aria-labelledby="projects-title" class="block">
       <div class="block-head" data-reveal>
-        <h2 id="projects-title" class="section-title">Selected Projects</h2>
+        <h2 id="projects-title" class="section-title">
+          Selected Projects
+        </h2>
         <a href={withBase("/projects")} class="view-all">
           View all <Icon name="arrow-up-right" size={14} />
         </a>
       </div>
-      {
-        featured.length > 0 ? (
-          <div class="projects">
-            {featured.map((project, i) => (
-              <div data-reveal style={`--reveal-i: ${i}`}>
-                <ProjectCard project={project} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p class="empty" data-reveal>
-            Projects are being written up and will appear here soon.
-          </p>
-        )
-      }
+      {featured.length > 0 ? (
+        <div class="projects">
+          {featured.map((project, i) => (
+            <div data-reveal style={`--reveal-i: ${i}`}>
+              <ProjectCard project={project} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="empty" data-reveal>
+          Projects are being written up and will appear here soon.
+        </p>
+      )}
     </section>
 
     <section aria-labelledby="articles-title" class="block">
       <div class="block-head" data-reveal>
-        <h2 id="articles-title" class="section-title">Recent Articles</h2>
+        <h2 id="articles-title" class="section-title">
+          Recent Articles
+        </h2>
         <a href={withBase("/blog")} class="view-all">
           View all <Icon name="arrow-up-right" size={14} />
         </a>

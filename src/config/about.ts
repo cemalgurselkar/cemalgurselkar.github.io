@@ -18,7 +18,7 @@ export const about = {
     "I care about the part after the demo — the evaluation, the failure mode, and the constraint that makes a result honest.",
   ],
 
-  location: "Adana / Mersin, Türkiye",
+  location: "Mersin, Türkiye",
 
   interests: [
     "Retrieval and evaluation of LLM systems",
@@ -59,15 +59,41 @@ export const about = {
   skills: [
     {
       group: "AI / ML",
-      items: ["Python", "PyTorch", "TensorFlow", "Scikit-Learn", "XGBoost", "Pandas", "NumPy", "Ollama", "Qdrant", "PEFT / LoRA"],
+      items: [
+        "Python",
+        "PyTorch",
+        "TensorFlow",
+        "Scikit-Learn",
+        "XGBoost",
+        "Pandas",
+        "NumPy",
+        "Ollama",
+        "Qdrant",
+        "PEFT / LoRA",
+      ],
     },
     {
       group: "Data",
-      items: ["Kafka", "Spark / PySpark", "Airflow", "DuckDB", "PostgreSQL", "Parquet", "SQL"],
+      items: [
+        "Kafka",
+        "Spark / PySpark",
+        "Airflow",
+        "DuckDB",
+        "PostgreSQL",
+        "Parquet",
+        "SQL",
+      ],
     },
     {
       group: "Systems",
-      items: ["Docker", "FastAPI", "ROS 2", "Gazebo", "Ultralytics YOLO", "Git"],
+      items: [
+        "Docker",
+        "FastAPI",
+        "ROS 2",
+        "Gazebo",
+        "Ultralytics YOLO",
+        "Git",
+      ],
     },
   ],
 };

@@ -15,7 +15,8 @@ declare global {
 const root = document.documentElement;
 
 function revealAll(): void {
-  for (const el of document.querySelectorAll<HTMLElement>("[data-reveal]")) el.classList.add("is-visible");
+  for (const el of document.querySelectorAll<HTMLElement>("[data-reveal]"))
+    el.classList.add("is-visible");
 }
 
 export function initReveal(): void {
@@ -38,7 +39,8 @@ export function initReveal(): void {
     { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
   );
 
-  for (const el of document.querySelectorAll<HTMLElement>("[data-reveal]")) observer.observe(el);
+  for (const el of document.querySelectorAll<HTMLElement>("[data-reveal]"))
+    observer.observe(el);
 
   // Belt and braces: jumping to an anchor or printing must never leave content hidden.
   window.addEventListener("hashchange", revealAll);

@@ -23,10 +23,10 @@ MarketStream separates exchange ingestion, Kafka buffering, PySpark processing, 
 
 Audited at commit `c1a2592`.
 
-| Measure | Value | Context |
-| --- | --- | --- |
+| Measure             | Value           | Context                                                                                    |
+| ------------------- | --------------- | ------------------------------------------------------------------------------------------ |
 | Durable writer rate | 11,569 events/s | One recorded run that requested 50,000 events/s; backlog and sampled latency were present. |
-| Captured tests | 23 passed | Recorded by the checked-in test report in its captured environment. |
+| Captured tests      | 23 passed       | Recorded by the checked-in test report in its captured environment.                        |
 
 ## Limitations
 

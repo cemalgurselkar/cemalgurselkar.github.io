@@ -1,0 +1,96 @@
+---
+/**
+ * Transparent, accessible button over an object in the artwork (monitor, telescope).
+ * Invisible until hovered/focused: lavender outline + pixel tooltip.
+ * Rendered `hidden`; the owning script reveals it only when its feature can work
+ * (no JS → no dead button).
+ */
+import type { HTMLAttributes } from "astro/types";
+import { regionStyle, type RegionName } from "../../lib/observatory-map";
+
+interface Props extends Omit<HTMLAttributes<"button">, "style" | "type"> {
+  region: RegionName;
+  /** Accessible name, e.g. "Open terminal". */
+  label: string;
+  /** Visible tooltip text, e.g. "> Open Terminal". */
+  tooltip: string;
+}
+
+const { region, label, tooltip, class: className, ...attrs } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={["scene-hotspot", className]}
+  style={regionStyle(region)}
+  aria-label={label}
+  hidden
+  {...attrs}
+>
+  <span class="tooltip" aria-hidden="true">
+    {tooltip}
+  </span>
+</button>
+
+<style>
+  .scene-hotspot {
+    position: absolute;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--ease),
+      box-shadow var(--ease);
+  }
+
+  .scene-hotspot[hidden] {
+    display: none;
+  }
+
+  .scene-hotspot:hover,
+  .scene-hotspot:focus-visible {
+    background: rgb(180 164 222 / 0.08);
+    box-shadow:
+      0 0 0 2px rgb(180 164 222 / 0.75),
+      0 0 18px rgb(180 164 222 / 0.25);
+    outline: none;
+  }
+
+  .tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    padding: 5px 9px 4px;
+    font-family: var(--font-pixel);
+    font-size: 14px;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 0; /* square, pixel-style corners */
+    box-shadow: 3px 3px 0 rgb(15 16 28 / 0.7);
+    opacity: 0;
+    translate: -50% 4px;
+    transition:
+      opacity var(--ease),
+      translate var(--ease);
+    pointer-events: none;
+  }
+
+  /* Objects near the right edge (telescope): centre the tooltip near the left end of the
+     object (the lens), which stays on screen even when the object is partly cropped. */
+  .tooltip-left .tooltip {
+    left: 10%;
+  }
+
+  .scene-hotspot:hover .tooltip,
+  .scene-hotspot:focus-visible .tooltip {
+    opacity: 1;
+    translate: -50% 0;
+  }
+</style>

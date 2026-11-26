@@ -14,41 +14,44 @@ interface Props {
 const { articles, showDescription = true, reveal = true } = Astro.props;
 ---
 
-{
-  articles.length === 0 ? (
-    <p class="empty">No articles published yet. They'll appear here once they're out on Medium.</p>
-  ) : (
-    <ul class="articles">
-      {articles.map((article, i) => (
-        <li data-reveal={reveal ? "" : undefined} style={`--reveal-i: ${Math.min(i, 3)}`}>
-          <time class="date" datetime={article.data.publishedAt.toISOString()}>
-            {dateFormat.format(article.data.publishedAt)}
-          </time>
-          <div class="body">
-            {/* Opens the original article on Medium (same tab). */}
-            <a class="title" href={article.data.url}>
-              {article.data.title}
-              <span class="sr-only"> (on Medium)</span>
-            </a>
-            {showDescription && article.data.description && (
-              <p class="desc">{article.data.description}</p>
-            )}
-            {article.data.tags.length > 0 && (
-              <ul class="tags" aria-label="Tags">
-                {article.data.tags.map((tag) => (
-                  <li>{tag}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <span class="source" aria-hidden="true">
-            Medium <Icon name="arrow-up-right" size={13} />
-          </span>
-        </li>
-      ))}
-    </ul>
-  )
-}
+{articles.length === 0 ? (
+  <p class="empty">
+    No articles published yet. They'll appear here once they're out on Medium.
+  </p>
+) : (
+  <ul class="articles">
+    {articles.map((article, i) => (
+      <li
+        data-reveal={reveal ? "" : undefined}
+        style={`--reveal-i: ${Math.min(i, 3)}`}
+      >
+        <time class="date" datetime={article.data.publishedAt.toISOString()}>
+          {dateFormat.format(article.data.publishedAt)}
+        </time>
+        <div class="body">
+          {/* Opens the original article on Medium (same tab). */}
+          <a class="title" href={article.data.url}>
+            {article.data.title}
+            <span class="sr-only"> (on Medium)</span>
+          </a>
+          {showDescription && article.data.description && (
+            <p class="desc">{article.data.description}</p>
+          )}
+          {article.data.tags.length > 0 && (
+            <ul class="tags" aria-label="Tags">
+              {article.data.tags.map((tag) => (
+                <li>{tag}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <span class="source" aria-hidden="true">
+          Medium <Icon name="arrow-up-right" size={13} />
+        </span>
+      </li>
+    ))}
+  </ul>
+)}
 
 <style>
   .articles {

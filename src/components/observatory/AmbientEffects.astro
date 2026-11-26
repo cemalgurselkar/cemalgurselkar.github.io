@@ -1,0 +1,125 @@
+---
+/**
+ * Pure-CSS ambient layers: galaxy shimmer, lamp light, coffee steam.
+ * All animate only opacity/transform. With reduced motion (or the motion toggle) they rest in
+ * their base state: steam invisible, galaxy and lamp at a constant low level.
+ */
+import { REGIONS, regionStyle } from "../../lib/observatory-map";
+
+// Bulb position inside the lamp-light box, as % (bulb ≈ 1170, 607 in source px).
+const lamp = REGIONS.lampLight;
+const bulbX = (((1170 - lamp.x) / lamp.w) * 100).toFixed(1);
+const bulbY = (((607 - lamp.y) / lamp.h) * 100).toFixed(1);
+
+// Steam puffs: horizontal start (% of the steam box), rise time, delay.
+const puffs = [
+  { left: 36, duration: 5.6, delay: 0 },
+  { left: 52, duration: 6.4, delay: -1.6 },
+  { left: 44, duration: 5.2, delay: -3.1 },
+  { left: 58, duration: 6.8, delay: -4.4 },
+];
+---
+
+<div
+  class="galaxy-glow parallax"
+  style={`${regionStyle("galaxy")};--depth:0.6`}
+  aria-hidden="true"
+></div>
+
+<div
+  class="lamp-light"
+  style={`${regionStyle("lampLight")};--bulb-x:${bulbX}%;--bulb-y:${bulbY}%`}
+  aria-hidden="true"
+></div>
+
+<div class="steam" style={regionStyle("steam")} aria-hidden="true">
+  {puffs.map((p) => (
+    <span
+      class="puff"
+      style={`left:${p.left}%;--d:${p.duration}s;--delay:${p.delay}s`}
+    />
+  ))}
+</div>
+
+<style>
+  .galaxy-glow,
+  .lamp-light,
+  .steam {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  /* A soft brightening that follows the galaxy's tilt; the image itself never moves. */
+  .galaxy-glow {
+    background: radial-gradient(
+      ellipse 46% 22% at 52% 50%,
+      rgb(214 190 255 / 0.5),
+      rgb(180 164 222 / 0.18) 45%,
+      rgb(180 164 222 / 0) 72%
+    );
+    rotate: -24deg;
+    mix-blend-mode: screen;
+    opacity: 0.28;
+    animation: galaxy-breathe 11s ease-in-out infinite alternate;
+  }
+
+  @keyframes galaxy-breathe {
+    to {
+      opacity: 0.55;
+    }
+  }
+
+  /* Warm pool of light; a slow 7s swell between two close levels — no flicker. */
+  .lamp-light {
+    background: radial-gradient(
+      ellipse 42% 48% at var(--bulb-x) var(--bulb-y),
+      rgb(255 196 128 / 0.3),
+      rgb(220 164 120 / 0.1) 50%,
+      rgb(220 164 120 / 0) 75%
+    );
+    mix-blend-mode: screen;
+    opacity: 0.5;
+    animation: lamp-swell 7s ease-in-out infinite alternate;
+  }
+
+  @keyframes lamp-swell {
+    to {
+      opacity: 0.64;
+    }
+  }
+
+  /* Pixel steam: small squares that rise, drift and fade above the mug. */
+  .steam {
+    overflow: hidden;
+  }
+
+  .puff {
+    position: absolute;
+    bottom: 2%;
+    width: 9%;
+    aspect-ratio: 1;
+    background: rgb(214 206 236);
+    opacity: 0;
+    animation: rise var(--d) linear var(--delay) infinite;
+  }
+
+  @keyframes rise {
+    0% {
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.32;
+    }
+    45% {
+      transform: translate(70%, -800%);
+    }
+    75% {
+      opacity: 0.18;
+    }
+    100% {
+      transform: translate(-50%, -1700%);
+      opacity: 0;
+    }
+  }
+</style>

@@ -24,10 +24,10 @@ AstraRAG parses PDFs, creates token-based chunks, builds local embeddings, and s
 Audited at commit `f0cdc78`: 40 queries over five PDFs (314 chunks), documented warm local run.
 
 | Retrieval path | Hit@10 |
-| --- | --- |
-| Dense | 0.625 |
-| BM25 | 0.775 |
-| Hybrid (RRF) | 0.750 |
+| -------------- | ------ |
+| Dense          | 0.625  |
+| BM25           | 0.775  |
+| Hybrid (RRF)   | 0.750  |
 
 ## Limitations
 

@@ -10,7 +10,10 @@ import { withBase } from "../../lib/paths";
 
 export const getStaticPaths = (async () => {
   const projects = await getProjects();
-  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
 }) satisfies GetStaticPaths;
 
 const { project } = Astro.props;
@@ -23,55 +26,53 @@ const hasBody = Boolean(project.body?.trim());
 <BaseLayout title={title} description={description}>
   <article class="project">
     <header class="head">
-      <a href={withBase("/projects")} class="back">← Projects</a>
+      <a href={withBase("/projects")} class="back">
+        ← Projects
+      </a>
       <h1>{title}</h1>
       <p class="lede">{description}</p>
 
-      {
-        technologies.length > 0 && (
-          <ul class="tech" aria-label="Technologies">
-            {technologies.map((tech) => (
-              <li>{tech}</li>
-            ))}
-          </ul>
-        )
-      }
+      {technologies.length > 0 && (
+        <ul class="tech" aria-label="Technologies">
+          {technologies.map((tech) => (
+            <li>{tech}</li>
+          ))}
+        </ul>
+      )}
       {status && <p class="meta">Status: {status}</p>}
 
-      {
-        (repoUrl || links.length > 0) && (
-          <ul class="links">
-            {repoUrl && (
-              <li>
-                <a href={repoUrl} target="_blank" rel="noopener" class="repo">
-                  <Icon name="github" size={16} />
-                  Repository
-                  <Icon name="arrow-up-right" size={14} />
-                </a>
-              </li>
-            )}
-            {links.map((link) => (
-              <li>
-                <a href={link.url} target="_blank" rel="noopener">
-                  {link.label}
-                  <Icon name="arrow-up-right" size={14} />
-                </a>
-              </li>
-            ))}
-          </ul>
-        )
-      }
+      {(repoUrl || links.length > 0) && (
+        <ul class="links">
+          {repoUrl && (
+            <li>
+              <a href={repoUrl} target="_blank" rel="noopener" class="repo">
+                <Icon name="github" size={16} />
+                Repository
+                <Icon name="arrow-up-right" size={14} />
+              </a>
+            </li>
+          )}
+          {links.map((link) => (
+            <li>
+              <a href={link.url} target="_blank" rel="noopener">
+                {link.label}
+                <Icon name="arrow-up-right" size={14} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </header>
 
-    {
-      hasBody ? (
-        <div class="prose">
-          <Content />
-        </div>
-      ) : (
-        <p class="empty">A detailed write-up for this project hasn't been published yet.</p>
-      )
-    }
+    {hasBody ? (
+      <div class="prose">
+        <Content />
+      </div>
+    ) : (
+      <p class="empty">
+        A detailed write-up for this project hasn't been published yet.
+      </p>
+    )}
   </article>
 </BaseLayout>
 

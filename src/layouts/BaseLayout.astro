@@ -16,10 +16,16 @@ interface Props {
   immersive?: boolean;
 }
 
-const { title, description = siteConfig.tagline, immersive = false } = Astro.props;
+const {
+  title,
+  description = siteConfig.tagline,
+  immersive = false,
+} = Astro.props;
 const pageTitle = title ? `${title} · ${siteConfig.name}` : siteConfig.name;
 const siteUrl = import.meta.env.SITE || siteConfig.siteUrl;
-const canonical = siteUrl ? new URL(Astro.url.pathname, siteUrl).href : undefined;
+const canonical = siteUrl
+  ? new URL(Astro.url.pathname, siteUrl).href
+  : undefined;
 ---
 
 <!doctype html>
@@ -37,7 +43,9 @@ const canonical = siteUrl ? new URL(Astro.url.pathname, siteUrl).href : undefine
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
-    {import.meta.env.SITE && <link rel="sitemap" href={withBase("/sitemap-index.xml")} />}
+    {import.meta.env.SITE && (
+      <link rel="sitemap" href={withBase("/sitemap-index.xml")} />
+    )}
 
     <!--
       Runs before first paint: applies the saved motion preference and enables the scroll
@@ -46,13 +54,17 @@ const canonical = siteUrl ? new URL(Astro.url.pathname, siteUrl).href : undefine
     -->
     <script is:inline>
       (function () {
-        var root = document.documentElement;
-        var off = false;
+        const root = document.documentElement;
+        let off = false;
         try {
           off = localStorage.getItem("motion") === "off";
-        } catch (e) {}
+        } catch {
+          // Keep the default motion preference if localStorage is unavailable
+        }
         if (off) root.setAttribute("data-motion", "off");
-        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const reduce =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         if (!off && !reduce && "IntersectionObserver" in window) {
           root.classList.add("motion-ready");
           setTimeout(function () {
@@ -64,9 +76,15 @@ const canonical = siteUrl ? new URL(Astro.url.pathname, siteUrl).href : undefine
     <slot name="head" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
     <Header overlay={immersive} />
-    <main id="main" class={immersive ? "pb-16" : "site-container pb-16"} tabindex="-1">
+    <main
+      id="main"
+      class={immersive ? "pb-16" : "site-container pb-16"}
+      tabindex="-1"
+    >
       <slot />
     </main>
     <Footer />
