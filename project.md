@@ -308,3 +308,20 @@ pnpm test:e2e                   # then run `pnpm build` again before using dist/
 - **D:** GitHub metadata.
 - **E:** stars, shooting star and monitor animations.
 - **F:** CI/CD YAML and the full README.
+
+---
+
+## 8. Revision 2: animated page transitions (option A)
+
+You asked for softer, more noticeable transitions between Home / Projects / Blog / About and chose **option A** (CSS only, no JavaScript).
+
+- **Header:** stays perfectly still between pages (`view-transition-name: site-header`). Only the active-link highlight cross-fades.
+- **Page content (`<main>`):** the old page fades out while drifting up 8px (160ms). The new page fades in rising 12px (280ms, starting after 60ms). The whole transition takes about 340ms.
+  - **Plan deviation, approved by you:** this is longer than the plan's 150–200ms.
+- **Footer and background:** a plain 200ms fade.
+- **Different page heights:** the content box snaps to the new height and only the content animates, so the long home page doesn't "stretch" into a short one.
+- **Off switches:** OS "reduce motion" and the footer "Reduce motion" toggle both turn it off completely.
+- **Browser support:** Chrome, Edge and Safari 18.2+ animate. Browsers without cross-document view transitions (e.g. Firefox) simply open the page normally.
+- **Files:** `src/styles/global.css` (transition rules) and `src/components/Header.astro` (one line).
+- **Status:** not run or tested. Check it by clicking through the nav in Chrome or Edge.
+- **To tune:** the durations and the 8px/12px distances are in the `page-out` / `page-in` rules in `global.css`.

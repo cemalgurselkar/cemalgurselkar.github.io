@@ -59,6 +59,8 @@ const links = navigation.map((item) => ({
 
 <style>
   .header {
+    /* Own snapshot in page transitions, so the header stays still between pages. */
+    view-transition-name: site-header;
     position: relative;
     display: flex;
     align-items: center;

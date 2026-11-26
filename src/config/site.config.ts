@@ -34,7 +34,7 @@ export interface SiteConfig {
 export const siteConfig: SiteConfig = {
   name: "Cemal Gürsel Kar",
   wordmark: "Cemal Gürsel Kar",
-  role: "Junior Ai/Data Engineer",
+  role: "Junior Software Engineer (about Ai/Data-driven system)",
   tagline: "Exploring computation, intelligence and complex systems.",
   bio: "I build AI and data systems that can be opened up, measured, and questioned — retrieval pipelines with evaluation, streaming infrastructure with visible boundaries, and robot workflows that keep language grounded in state.",
   locale: "en",
@@ -47,8 +47,8 @@ export const siteConfig: SiteConfig = {
   currentFocus: ["AI/ML and data systems"],
   featuredRepos: ["cemalgurselkar/astraRag", "cemalgurselkar/fast_orderbook"],
   // Not provided yet — fill in your real Medium addresses; nothing is shown or fetched until then.
-  mediumFeedUrl: undefined,
-  mediumProfileUrl: undefined,
+  mediumFeedUrl: "https://medium.com/feed/@cemalgurselkar",
+  mediumProfileUrl: "https://medium.com/@cemalgurselkar",
   mediumAllowedHosts: [],
   siteUrl: undefined,
 };

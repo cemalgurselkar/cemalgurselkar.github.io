@@ -111,21 +111,70 @@
     scroll-behavior: smooth;
   }
 
-  /* Cross-document page fade (150–200ms); browsers without support just navigate normally. */
+  /* Cross-document page transition; browsers without support just navigate normally. */
   @view-transition {
     navigation: auto;
   }
 }
 
+/*
+ * Page transition (option A, approved by the user: ~300ms total, slightly over the plan's 200ms).
+ * - Header stays put (its own snapshot; only the active-link change cross-fades).
+ * - Page content: old content fades out while drifting up 8px, new content fades in rising 12px.
+ * - Everything else (background, footer) does a quick plain fade.
+ * Browsers without cross-document view transitions (e.g. Firefox) simply navigate normally.
+ */
+main {
+  view-transition-name: page;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 180ms;
+  animation-duration: 200ms;
   animation-timing-function: ease-out;
 }
 
-:root[data-motion="off"]::view-transition-old(root),
-:root[data-motion="off"]::view-transition-new(root) {
-  animation: none;
+::view-transition-group(site-header) {
+  animation-duration: 0s; /* never moves */
+}
+
+::view-transition-old(site-header),
+::view-transition-new(site-header) {
+  animation-duration: 200ms;
+}
+
+/* Pages have very different heights (home is ~3 screens): snap the box, animate only the content. */
+::view-transition-group(page) {
+  animation-duration: 0s;
+}
+
+::view-transition-old(page) {
+  animation: page-out 160ms ease-in both;
+}
+
+::view-transition-new(page) {
+  animation: page-in 280ms cubic-bezier(0.2, 0.7, 0.3, 1) 60ms both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* The motion toggle switches all of it off (reduced motion never enables it at all). */
+:root[data-motion="off"]::view-transition-group(*),
+:root[data-motion="off"]::view-transition-old(*),
+:root[data-motion="off"]::view-transition-new(*) {
+  animation: none !important;
 }
 
 /* Scroll reveal: once, opacity + 12px, 400ms ease-out, max 60ms stagger step. */
