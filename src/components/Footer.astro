@@ -1,0 +1,62 @@
+---
+import MotionToggle from "./MotionToggle.astro";
+import { siteConfig } from "../config/site.config";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-container footer">
+  <p class="meta">© {year} {siteConfig.name}</p>
+  <ul>
+    {
+      siteConfig.githubUrl && (
+        <li>
+          <a href={siteConfig.githubUrl} rel="me noopener" target="_blank">
+            GitHub
+          </a>
+        </li>
+      )
+    }
+    {
+      siteConfig.email && (
+        <li>
+          <a href={`mailto:${siteConfig.email}`}>Contact</a>
+        </li>
+      )
+    }
+    <li><MotionToggle /></li>
+  </ul>
+</footer>
+
+<style>
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding-block: 20px 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+</style>

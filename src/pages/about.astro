@@ -1,0 +1,245 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import { siteConfig } from "../config/site.config";
+import { about, type TimelineItem } from "../config/about";
+import { withBase } from "../lib/paths";
+
+const contacts = [
+  siteConfig.email && { label: siteConfig.email, href: `mailto:${siteConfig.email}`, external: false },
+  siteConfig.githubUrl && { label: "GitHub", href: siteConfig.githubUrl, external: true },
+  siteConfig.linkedinUrl && { label: "LinkedIn", href: siteConfig.linkedinUrl, external: true },
+  siteConfig.resumePath && { label: "Resume (PDF)", href: withBase(siteConfig.resumePath), external: true },
+].filter((c): c is { label: string; href: string; external: boolean } => Boolean(c));
+
+const timelines: { id: string; title: string; items: TimelineItem[] }[] = [
+  { id: "experience", title: "Experience", items: about.experience },
+  { id: "education", title: "Education", items: about.education },
+].filter((t) => t.items.length > 0);
+---
+
+<BaseLayout title="About" description={`About ${siteConfig.name} — ${siteConfig.role}.`}>
+  <div class="page">
+    <header>
+      <h1>About</h1>
+      <p class="meta">
+        {siteConfig.role}{about.location && ` · ${about.location}`}
+      </p>
+    </header>
+
+    <section aria-label="Introduction" class="intro">
+      {about.intro.map((p) => <p>{p}</p>)}
+    </section>
+
+    {
+      about.interests.length > 0 && (
+        <section aria-labelledby="interests" class="block">
+          <h2 id="interests" class="section-title">Interests</h2>
+          <ul class="interests">
+            {about.interests.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      timelines.map((timeline) => (
+        <section aria-labelledby={timeline.id} class="block">
+          <h2 id={timeline.id} class="section-title">
+            {timeline.title}
+          </h2>
+          <ol class="timeline">
+            {timeline.items.map((item) => (
+              <li>
+                <div class="row">
+                  <h3>
+                    {item.title} <span class="org">· {item.org}</span>
+                  </h3>
+                  <span class="meta">{item.period}</span>
+                </div>
+                <p>{item.detail}</p>
+                {item.tags && item.tags.length > 0 && (
+                  <ul class="tags" aria-label="Tools">
+                    {item.tags.map((tag) => (
+                      <li>{tag}</li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+
+    {
+      about.skills.length > 0 && (
+        <section aria-labelledby="skills" class="block">
+          <h2 id="skills" class="section-title">Tools I work with</h2>
+          <dl class="skills">
+            {about.skills.map((group) => (
+              <div>
+                <dt class="meta">{group.group}</dt>
+                <dd>{group.items.join(" · ")}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )
+    }
+
+    {
+      contacts.length > 0 && (
+        <section aria-labelledby="contact" class="block">
+          <h2 id="contact" class="section-title">Contact</h2>
+          <ul class="contacts">
+            {contacts.map((c) => (
+              <li>
+                <a href={c.href} {...(c.external ? { target: "_blank", rel: "me noopener" } : {})}>
+                  {c.label}
+                  {c.external && <Icon name="arrow-up-right" size={14} />}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    max-width: 760px;
+    padding-top: 24px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(28px, 3vw + 14px, 36px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  header .meta {
+    margin: 8px 0 0;
+    color: var(--warm);
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  .intro p {
+    margin: 0;
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .section-title {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .interests {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .interests li::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin: 0 12px 2px 0;
+    background: var(--accent);
+  }
+
+  .timeline {
+    border-top: 1px solid var(--border);
+  }
+
+  .timeline > li {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 16px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .org {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .timeline p {
+    margin: 6px 0 0;
+    color: var(--muted);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 8px;
+    font-family: var(--font-code);
+    font-size: 12px;
+    color: var(--warm);
+  }
+
+  .skills {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .skills dd {
+    margin: 2px 0 0;
+  }
+
+  .contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 22px;
+  }
+
+  .contacts a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 44px;
+    overflow-wrap: anywhere;
+  }
+</style>

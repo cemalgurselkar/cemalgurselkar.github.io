@@ -1,0 +1,118 @@
+---
+import type { CollectionEntry } from "astro:content";
+import Icon from "./Icon.astro";
+import { withBase } from "../lib/paths";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+  /** Heading level for the title, so pages keep a correct outline. */
+  headingLevel?: 2 | 3;
+}
+
+const { project, headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as "h2" | "h3";
+const { title, description, repo, technologies } = project.data;
+const repoUrl = repo ? `https://github.com/${repo}` : undefined;
+---
+
+<!-- No nested anchors: the title links to the detail page, the icon to the repository. -->
+<article class="card">
+  <div class="head">
+    <Heading class="title">
+      <a href={withBase(`/projects/${project.id}`)}>{title}</a>
+    </Heading>
+    {
+      repoUrl && (
+        <a class="repo" href={repoUrl} target="_blank" rel="noopener" aria-label={`${title} on GitHub`}>
+          <Icon name="github" size={18} />
+        </a>
+      )
+    }
+  </div>
+  <p class="desc">{description}</p>
+  {
+    technologies.length > 0 && (
+      <ul class="tech" aria-label="Technologies">
+        {technologies.map((tech) => (
+          <li>{tech}</li>
+        ))}
+      </ul>
+    )
+  }
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 20px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition:
+      background-color var(--ease),
+      border-color var(--ease);
+  }
+
+  .card:hover,
+  .card:focus-within {
+    background: var(--surface-hover);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  }
+
+  .head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .title {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .title a {
+    color: var(--text);
+  }
+
+  .title a:hover {
+    color: var(--accent);
+  }
+
+  .repo {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    margin: -12px -12px 0 0;
+    color: var(--muted);
+    border-radius: var(--radius);
+  }
+
+  .repo:hover {
+    color: var(--accent);
+  }
+
+  .desc {
+    margin: 0;
+    font-size: 15px;
+    color: var(--muted);
+  }
+
+  .tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: auto 0 0;
+    padding: 4px 0 0;
+    list-style: none;
+    font-family: var(--font-code);
+    font-size: 12px;
+    color: var(--warm);
+  }
+</style>

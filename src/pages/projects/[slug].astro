@@ -1,0 +1,150 @@
+---
+import "katex/dist/katex.min.css";
+import "../../styles/prose.css";
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Icon from "../../components/Icon.astro";
+import { getProjects } from "../../lib/content";
+import { withBase } from "../../lib/paths";
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}) satisfies GetStaticPaths;
+
+const { project } = Astro.props;
+const { title, description, repo, technologies, status, links } = project.data;
+const repoUrl = repo ? `https://github.com/${repo}` : undefined;
+const { Content } = await render(project);
+const hasBody = Boolean(project.body?.trim());
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="project">
+    <header class="head">
+      <a href={withBase("/projects")} class="back">← Projects</a>
+      <h1>{title}</h1>
+      <p class="lede">{description}</p>
+
+      {
+        technologies.length > 0 && (
+          <ul class="tech" aria-label="Technologies">
+            {technologies.map((tech) => (
+              <li>{tech}</li>
+            ))}
+          </ul>
+        )
+      }
+      {status && <p class="meta">Status: {status}</p>}
+
+      {
+        (repoUrl || links.length > 0) && (
+          <ul class="links">
+            {repoUrl && (
+              <li>
+                <a href={repoUrl} target="_blank" rel="noopener" class="repo">
+                  <Icon name="github" size={16} />
+                  Repository
+                  <Icon name="arrow-up-right" size={14} />
+                </a>
+              </li>
+            )}
+            {links.map((link) => (
+              <li>
+                <a href={link.url} target="_blank" rel="noopener">
+                  {link.label}
+                  <Icon name="arrow-up-right" size={14} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    {
+      hasBody ? (
+        <div class="prose">
+          <Content />
+        </div>
+      ) : (
+        <p class="empty">A detailed write-up for this project hasn't been published yet.</p>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  .project {
+    padding-top: 24px;
+  }
+
+  .head {
+    max-width: 70ch;
+    margin-bottom: 32px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .back:hover {
+    color: var(--accent);
+  }
+
+  h1 {
+    margin: 8px 0 0;
+    font-size: clamp(28px, 3vw + 14px, 36px);
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .lede {
+    margin: 12px 0 0;
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  .tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-code);
+    font-size: 12.5px;
+    color: var(--warm);
+  }
+
+  .meta {
+    margin: 8px 0 0;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 22px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 44px;
+    font-size: 15px;
+  }
+
+  .empty {
+    color: var(--muted);
+  }
+</style>

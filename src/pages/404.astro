@@ -1,0 +1,81 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/paths";
+---
+
+<BaseLayout title="Page not found" description="This page could not be found.">
+  <div class="page">
+    <!-- A tiny pixel telescope pointing at nothing. -->
+    <svg
+      class="pixel"
+      viewBox="0 0 16 12"
+      width="96"
+      height="72"
+      shape-rendering="crispEdges"
+      aria-hidden="true"
+    >
+      <rect x="13" y="1" width="1" height="1" fill="var(--text)" />
+      <rect x="10" y="3" width="1" height="1" fill="var(--muted)" />
+      <rect x="4" y="4" width="6" height="2" fill="var(--accent)" />
+      <rect x="3" y="5" width="1" height="2" fill="var(--accent)" />
+      <rect x="9" y="3" width="2" height="2" fill="var(--accent)" />
+      <rect x="6" y="6" width="1" height="4" fill="var(--muted)" />
+      <rect x="4" y="10" width="1" height="1" fill="var(--muted)" />
+      <rect x="8" y="10" width="1" height="1" fill="var(--muted)" />
+      <rect x="5" y="9" width="3" height="1" fill="var(--muted)" />
+    </svg>
+    <p class="code">404</p>
+    <h1>Nothing in this part of the sky.</h1>
+    <p class="lede">The page you're looking for doesn't exist or has moved.</p>
+    <ul>
+      <li><a href={withBase("/")}>Go home</a></li>
+      <li><a href={withBase("/blog")}>Read the blog</a></li>
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-block: 48px 24px;
+  }
+
+  .pixel {
+    margin-bottom: 20px;
+  }
+
+  .code {
+    margin: 0;
+    font-family: var(--font-code);
+    font-size: 13px;
+    color: var(--warm);
+  }
+
+  h1 {
+    margin: 6px 0 0;
+    font-size: clamp(24px, 2.5vw + 14px, 32px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .lede {
+    margin: 10px 0 0;
+    color: var(--muted);
+  }
+
+  ul {
+    display: flex;
+    gap: 24px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+</style>

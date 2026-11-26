@@ -1,15 +1,9 @@
-# dependencies and local tooling
+# dependencies
 /node_modules/
-/.tooling/
-/.pnp
-.pnp.js
 
 # generated output
-/.next/
-/.next-generated/
-/out/
-/build
 /dist/
+/.astro/
 /coverage/
 /playwright-report/
 /test-results/
@@ -20,18 +14,9 @@
 .env*
 !.env.example
 
-# private source documents
+# private source documents (a public resume goes in public/resume.pdf)
 /*.pdf
 
-# logs and debug output
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# logs
 *.log
-
-# vercel
-/.vercel/
-
-# typescript
 *.tsbuildinfo
-next-env.d.ts

@@ -1,0 +1,79 @@
+---
+import "@fontsource-variable/geist";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/500.css";
+import "../styles/global.css";
+
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { siteConfig } from "../config/site.config";
+import { withBase } from "../lib/paths";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Home page: <main> is full-width (the hero spans the viewport) and the header floats over it. */
+  immersive?: boolean;
+}
+
+const { title, description = siteConfig.tagline, immersive = false } = Astro.props;
+const pageTitle = title ? `${title} · ${siteConfig.name}` : siteConfig.name;
+const siteUrl = import.meta.env.SITE || siteConfig.siteUrl;
+const canonical = siteUrl ? new URL(Astro.url.pathname, siteUrl).href : undefined;
+---
+
+<!doctype html>
+<html lang={siteConfig.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0F101C" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {import.meta.env.SITE && <link rel="sitemap" href={withBase("/sitemap-index.xml")} />}
+
+    <!--
+      Runs before first paint: applies the saved motion preference and enables the scroll
+      reveal only when it can actually work. If the reveal module hasn't started within 3s,
+      the class is removed again so content can never stay hidden.
+    -->
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        var off = false;
+        try {
+          off = localStorage.getItem("motion") === "off";
+        } catch (e) {}
+        if (off) root.setAttribute("data-motion", "off");
+        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!off && !reduce && "IntersectionObserver" in window) {
+          root.classList.add("motion-ready");
+          setTimeout(function () {
+            if (!window.__motionReady) root.classList.remove("motion-ready");
+          }, 3000);
+        }
+      })();
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header overlay={immersive} />
+    <main id="main" class={immersive ? "pb-16" : "site-container pb-16"} tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      import { initReveal } from "../scripts/scroll-motion";
+      initReveal();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+[
+  {
+    "title": "Fixture — Middle article (archive copy, must be de-duplicated)",
+    "url": "https://medium.com/@test-author/fixture-middle-article-222",
+    "publishedAt": "2026-02-15"
+  },
+  {
+    "title": "Fixture — Archived article",
+    "url": "https://blog.example-publication.com/fixture-archived-article-444",
+    "publishedAt": "2025-11-20",
+    "description": "Older article that is no longer in the RSS feed.",
+    "tags": ["systems"]
+  },
+  {
+    "title": "Fixture — Oldest article",
+    "url": "https://medium.com/@test-author/fixture-oldest-article-555",
+    "publishedAt": "2025-06-01"
+  },
+  {
+    "title": "Fixture — Insecure link",
+    "url": "http://medium.com/@test-author/insecure-666",
+    "publishedAt": "2025-05-01"
+  }
+]

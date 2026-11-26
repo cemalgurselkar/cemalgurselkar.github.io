@@ -1,0 +1,196 @@
+---
+import Icon from "./Icon.astro";
+import { navigation, siteConfig } from "../config/site.config";
+import { isActive, withBase } from "../lib/paths";
+
+interface Props {
+  /** Transparent header floating over the full-screen hero (home page). */
+  overlay?: boolean;
+}
+
+const { overlay = false } = Astro.props;
+const pathname = Astro.url.pathname;
+const links = navigation.map((item) => ({
+  ...item,
+  url: withBase(item.href),
+  active: isActive(item.href, pathname),
+}));
+---
+
+<header class:list={["site-container header", { overlay }]}>
+  <a href={withBase("/")} class="wordmark" aria-label={`${siteConfig.name}, home`}>
+    {siteConfig.wordmark}
+  </a>
+
+  <nav aria-label="Main" class="nav-desktop">
+    <ul>
+      {
+        links.map((link) => (
+          <li>
+            <a href={link.url} aria-current={link.active ? "page" : undefined}>
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <!-- <details> keeps the mobile menu usable without JavaScript. -->
+  <details class="nav-mobile">
+    <summary aria-label="Menu">
+      <Icon name="menu" size={20} />
+    </summary>
+    <nav aria-label="Main (mobile)">
+      <ul>
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.url} aria-current={link.active ? "page" : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </details>
+</header>
+
+<style>
+  .header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);
+  }
+
+  /* Home: floats over the hero, transparent. Other pages: plain dark background (the page's). */
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+  }
+
+  .overlay .nav-desktop a {
+    color: color-mix(in srgb, var(--text) 80%, transparent);
+  }
+
+  .overlay .nav-desktop a:hover,
+  .overlay .nav-desktop a[aria-current="page"] {
+    color: var(--text);
+  }
+
+  .overlay .wordmark,
+  .overlay .nav-desktop a {
+    text-shadow: 0 1px 8px rgb(15 16 28 / 0.6);
+  }
+
+  .wordmark {
+    font-family: var(--font-code);
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    padding: 10px 0;
+  }
+
+  .wordmark:hover {
+    color: var(--accent);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  nav a:hover,
+  nav a[aria-current="page"] {
+    color: var(--text);
+  }
+
+  .nav-desktop ul {
+    display: flex;
+    gap: 28px;
+  }
+
+  /* Active page: a small 2px "pixel" underline rather than a full bar. */
+  .nav-desktop a[aria-current="page"]::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    width: 4px;
+    height: 4px;
+    translate: -50% 0;
+    background: var(--accent);
+  }
+
+  .nav-mobile {
+    display: none;
+  }
+
+  @media (max-width: 559px) {
+    .nav-desktop {
+      display: none;
+    }
+
+    .nav-mobile {
+      display: block;
+    }
+
+    .nav-mobile summary {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      margin-right: -10px;
+      color: var(--text);
+      cursor: pointer;
+      list-style: none;
+      border-radius: var(--radius);
+    }
+
+    .nav-mobile summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .nav-mobile[open] summary {
+      background: var(--surface);
+    }
+
+    .nav-mobile nav {
+      position: absolute;
+      top: calc(var(--header-h) - 6px);
+      right: 0;
+      left: 0;
+      z-index: 20;
+      padding: 6px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .nav-mobile a {
+      display: flex;
+      font-size: 15px;
+    }
+
+    .nav-mobile a[aria-current="page"] {
+      color: var(--accent);
+    }
+  }
+</style>

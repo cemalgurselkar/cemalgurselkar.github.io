@@ -1,8 +1,8 @@
-.next
-.next-generated
-coverage
+dist
+.astro
 node_modules
-out
-plan.md
+pnpm-lock.yaml
 playwright-report
 test-results
+src/assets
+plan.md

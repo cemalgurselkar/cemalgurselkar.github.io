@@ -1,0 +1,59 @@
+---
+// Hidden until JS runs: without JS there is no motion to turn off.
+---
+
+<button type="button" class="motion-toggle" data-motion-toggle hidden aria-pressed="false">
+  Reduce motion
+</button>
+
+<script>
+  import { isMotionOn, setMotion } from "../scripts/scroll-motion";
+
+  const button = document.querySelector<HTMLButtonElement>("[data-motion-toggle]");
+  if (button) {
+    const sync = () => button.setAttribute("aria-pressed", String(!isMotionOn()));
+    sync();
+    button.hidden = false;
+    button.addEventListener("click", () => {
+      setMotion(!isMotionOn());
+      sync();
+    });
+  }
+</script>
+
+<style>
+  .motion-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0;
+    font: inherit;
+    font-size: 14px;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    transition: color var(--ease);
+  }
+
+  .motion-toggle::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border: 1px solid currentColor;
+  }
+
+  .motion-toggle[aria-pressed="true"]::before {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .motion-toggle:hover {
+    color: var(--accent);
+  }
+
+  .motion-toggle[hidden] {
+    display: none;
+  }
+</style>

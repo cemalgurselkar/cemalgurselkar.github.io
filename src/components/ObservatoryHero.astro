@@ -1,0 +1,207 @@
+---
+import "@fontsource-variable/pixelify-sans";
+import { Picture } from "astro:assets";
+import observatory from "../assets/observatory-night.png";
+import { siteConfig } from "../config/site.config";
+
+/*
+ * Full-width, full-height hero (100svh).
+ *
+ * The image is `object-fit: cover`, so some of it is always cropped; which part is set by
+ * --hero-pos (desktop / landscape) and --hero-pos-mobile (portrait). Source image: 1672×941.
+ * Landmarks in the source, as fractions of width/height:
+ *   galaxy   x 0.65–0.88, y 0.07–0.32     monitor x 0.33–0.53, y 0.60–0.77
+ *   cat      x 0.62–0.74, y 0.75–0.84     telescope x 0.84–0.96, y 0.44–0.76
+ * On very wide or very tall screens not everything can stay visible; the defaults keep the
+ * desk and as much of the galaxy as the screen ratio allows.
+ *
+ * Future overlays (phase E: stars, monitor, steam) must use the same object-position, so they
+ * stay aligned with the crop.
+ */
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <Picture
+    src={observatory}
+    alt=""
+    formats={["avif", "webp"]}
+    widths={[640, 960, 1280, 1672]}
+    sizes="100vw"
+    quality={85}
+    loading="eager"
+    fetchpriority="high"
+    decoding="async"
+    class="hero-img"
+  />
+
+  <!-- Local darkening behind the title, plus the fade into the page background. -->
+  <div class="hero-shade" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <h1 id="hero-title" class="hero-title">
+      Hi! I'm <span class="name">{siteConfig.name}</span>
+    </h1>
+    <p class="hero-role">{siteConfig.role}</p>
+  </div>
+
+  <a href="#about" class="scroll-cue">
+    <span class="sr-only">Scroll to About me</span>
+    <!-- Pixel-art down arrow -->
+    <svg viewBox="0 0 7 8" width="21" height="24" shape-rendering="crispEdges" aria-hidden="true">
+      <rect x="3" y="0" width="1" height="6" fill="currentColor"></rect>
+      <rect x="0" y="3" width="1" height="1" fill="currentColor"></rect>
+      <rect x="1" y="4" width="1" height="1" fill="currentColor"></rect>
+      <rect x="2" y="5" width="1" height="1" fill="currentColor"></rect>
+      <rect x="3" y="6" width="1" height="1" fill="currentColor"></rect>
+      <rect x="4" y="5" width="1" height="1" fill="currentColor"></rect>
+      <rect x="5" y="4" width="1" height="1" fill="currentColor"></rect>
+      <rect x="6" y="3" width="1" height="1" fill="currentColor"></rect>
+    </svg>
+  </a>
+</section>
+
+<style>
+  .hero {
+    /* Crop controls: adjust these to taste. */
+    --hero-pos: 50% 40%;
+    --hero-pos-mobile: 58% 50%;
+    /* Vertical position of the title block inside the sky. */
+    --hero-title-top: 24%;
+
+    position: relative;
+    display: block;
+    width: 100%; /* not 100vw: avoids horizontal overflow from the scrollbar */
+    min-height: 100vh; /* fallback */
+    min-height: 100svh;
+    overflow: hidden;
+    background: var(--bg);
+    isolation: isolate;
+  }
+
+  .hero :global(picture) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .hero :global(.hero-img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--hero-pos);
+  }
+
+  @media (max-aspect-ratio: 4 / 5) {
+    .hero :global(.hero-img) {
+      object-position: var(--hero-pos-mobile);
+    }
+  }
+
+  .hero-shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      /* soft local darkening behind the title for contrast */
+      radial-gradient(
+        ellipse 46% 26% at 50% calc(var(--hero-title-top) + 6%),
+        rgb(15 16 28 / 0.55),
+        rgb(15 16 28 / 0) 100%
+      ),
+      /* a little shade under the floating header */
+      linear-gradient(to bottom, rgb(15 16 28 / 0.45), rgb(15 16 28 / 0) 120px),
+      /* short fade into the page background at the bottom edge */
+      linear-gradient(to bottom, rgb(15 16 28 / 0) 76%, var(--bg) 100%);
+  }
+
+  .hero-content {
+    position: absolute;
+    top: var(--hero-title-top);
+    left: 50%;
+    width: min(var(--content-max), calc(100% - 2 * var(--gutter)));
+    translate: -50% 0;
+    text-align: center;
+  }
+
+  .hero-title {
+    margin: 0;
+    font-family: var(--font-pixel);
+    font-weight: 500;
+    font-size: clamp(28px, 5vw, 64px);
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    text-shadow:
+      0 2px 0 rgb(15 16 28 / 0.65),
+      0 0 24px rgb(15 16 28 / 0.6);
+    text-wrap: balance;
+  }
+
+  .name {
+    color: var(--accent);
+  }
+
+  .hero-role {
+    margin: 12px 0 0;
+    font-family: var(--font-code);
+    font-size: clamp(13px, 1.2vw + 8px, 16px);
+    letter-spacing: 0.04em;
+    color: var(--warm);
+    text-shadow: 0 1px 8px rgb(15 16 28 / 0.8);
+  }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: max(20px, 4svh);
+    left: 50%;
+    translate: -50% 0;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    color: var(--text);
+    border-radius: var(--radius);
+    opacity: 0.85;
+  }
+
+  .scroll-cue:hover,
+  .scroll-cue:focus-visible {
+    color: var(--accent);
+    opacity: 1;
+  }
+
+  /* Motion: a slow bob on the arrow, and the title fading as the page scrolls.
+     Uses CSS scroll-driven animations (no scroll listener); unsupported browsers just skip it. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(:root:not([data-motion="off"])) .scroll-cue svg {
+      animation: bob 2.4s ease-in-out infinite;
+    }
+
+    @supports (animation-timeline: scroll()) {
+      :global(:root:not([data-motion="off"])) .hero-content {
+        animation: hero-fade linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0 70svh;
+      }
+    }
+  }
+
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(4px);
+    }
+  }
+
+  @keyframes hero-fade {
+    to {
+      opacity: 0;
+      transform: translateY(-24px);
+    }
+  }
+</style>

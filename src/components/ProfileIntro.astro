@@ -1,0 +1,86 @@
+---
+import Icon from "./Icon.astro";
+import CurrentFocus from "./CurrentFocus.astro";
+import { siteConfig } from "../config/site.config";
+import { withBase } from "../lib/paths";
+
+// The page H1 lives in the hero; this section starts at H2.
+// Only links with real values are rendered.
+const links = [
+  siteConfig.resumePath && { label: "CV", href: withBase(siteConfig.resumePath), external: true },
+  siteConfig.githubUrl && { label: "GitHub", href: siteConfig.githubUrl, external: true },
+  siteConfig.linkedinUrl && { label: "LinkedIn", href: siteConfig.linkedinUrl, external: true },
+  siteConfig.email && { label: "Email", href: `mailto:${siteConfig.email}`, external: false },
+].filter((link): link is { label: string; href: string; external: boolean } => Boolean(link));
+---
+
+<section id="about" class="about" aria-labelledby="about-title" data-reveal>
+  <h2 id="about-title" class="section-title">About me</h2>
+  <p class="tagline">{siteConfig.tagline}</p>
+  <p class="bio">{siteConfig.bio}</p>
+
+  {
+    links.length > 0 && (
+      <ul class="links">
+        {links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              {...(link.external ? { target: "_blank", rel: "me noopener noreferrer" } : {})}
+            >
+              {link.label}
+              {link.external && (
+                <>
+                  <Icon name="arrow-up-right" size={14} />
+                  <span class="sr-only"> (opens in a new tab)</span>
+                </>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <CurrentFocus />
+</section>
+
+<style>
+  .about {
+    /* Lands below the top edge when reached via the hero arrow. */
+    scroll-margin-top: 32px;
+  }
+
+  .section-title {
+    margin: 0;
+  }
+
+  .tagline {
+    margin: 14px 0 0;
+    font-size: 18px;
+    color: var(--text);
+  }
+
+  .bio {
+    margin: 8px 0 0;
+    max-width: 62ch;
+    color: var(--muted);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 22px;
+    margin: 12px 0 14px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 44px;
+    font-size: 15px;
+  }
+</style>

@@ -1,0 +1,120 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ObservatoryHero from "../components/ObservatoryHero.astro";
+import ProfileIntro from "../components/ProfileIntro.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import PostList from "../components/PostList.astro";
+import Icon from "../components/Icon.astro";
+import { withBase } from "../lib/paths";
+import { getArticles, getProjects } from "../lib/content";
+
+const MAX_FEATURED = 4;
+const RECENT_ARTICLES = 3;
+
+const featured = (await getProjects()).filter((p) => p.data.featured).slice(0, MAX_FEATURED);
+const recentArticles = (await getArticles()).slice(0, RECENT_ARTICLES);
+---
+
+<BaseLayout immersive>
+  <ObservatoryHero />
+
+  <div class="site-container home">
+    <ProfileIntro />
+
+    <section aria-labelledby="projects-title" class="block">
+      <div class="block-head" data-reveal>
+        <h2 id="projects-title" class="section-title">Selected Projects</h2>
+        <a href={withBase("/projects")} class="view-all">
+          View all <Icon name="arrow-up-right" size={14} />
+        </a>
+      </div>
+      {
+        featured.length > 0 ? (
+          <div class="projects">
+            {featured.map((project, i) => (
+              <div data-reveal style={`--reveal-i: ${i}`}>
+                <ProjectCard project={project} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p class="empty" data-reveal>
+            Projects are being written up and will appear here soon.
+          </p>
+        )
+      }
+    </section>
+
+    <section aria-labelledby="articles-title" class="block">
+      <div class="block-head" data-reveal>
+        <h2 id="articles-title" class="section-title">Recent Articles</h2>
+        <a href={withBase("/blog")} class="view-all">
+          View all <Icon name="arrow-up-right" size={14} />
+        </a>
+      </div>
+      <PostList articles={recentArticles} />
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .home {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    /* Overlaps the hero's bottom fade slightly so the transition feels continuous. */
+    margin-top: calc(var(--section-gap) * -0.25);
+    position: relative;
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .block-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .section-title {
+    margin: 0;
+  }
+
+  .view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 44px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .projects {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .projects > div {
+    display: flex;
+  }
+
+  .projects > div > :global(*) {
+    flex: 1;
+  }
+
+  @media (max-width: 699px) {
+    .projects {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .empty {
+    margin: 0;
+    color: var(--muted);
+  }
+</style>

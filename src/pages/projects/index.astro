@@ -1,0 +1,76 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { getProjects } from "../../lib/content";
+import { siteConfig } from "../../config/site.config";
+
+const projects = await getProjects();
+---
+
+<BaseLayout title="Projects" description="Selected software, AI/ML and data-systems projects.">
+  <div class="page">
+    <header>
+      <h1>Projects</h1>
+      <p class="intro">
+        Selected work, with the limits stated next to the results.
+        {
+          siteConfig.githubUrl && (
+            <>
+              {"More on "}
+              <a href={siteConfig.githubUrl} target="_blank" rel="noopener">
+                GitHub
+              </a>
+              .
+            </>
+          )
+        }
+      </p>
+    </header>
+
+    {
+      projects.length > 0 ? (
+        <div class="grid">
+          {projects.map((project) => (
+            <ProjectCard project={project} headingLevel={2} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty">Projects are being written up and will appear here soon.</p>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding-top: 24px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(28px, 3vw + 14px, 36px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .intro,
+  .empty {
+    margin: 8px 0 0;
+    color: var(--muted);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  @media (max-width: 699px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

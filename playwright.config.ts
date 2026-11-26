@@ -1,55 +1,25 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const port = 4173;
-const externalBaseUrl = process.env.PLAYWRIGHT_BASE_URL;
-const baseURL = externalBaseUrl ?? `http://127.0.0.1:${port}`;
+// Own port so a running `pnpm dev` (real content) is never reused for fixture-based tests.
+const PORT = 4322;
 
 export default defineConfig({
-  testDir: "./tests/e2e",
+  testDir: "./tests",
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 2 : 0,
+  retries: 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL,
-    trace: "on-first-retry",
+    baseURL: `http://localhost:${PORT}`,
+    trace: "retain-on-failure",
   },
-  projects: [
-    {
-      name: "mobile-360",
-      use: {
-        ...devices["Desktop Chrome"],
-        viewport: { width: 360, height: 800 },
-      },
-    },
-    {
-      name: "tablet-768",
-      use: {
-        ...devices["Desktop Chrome"],
-        viewport: { width: 768, height: 1024 },
-      },
-    },
-    {
-      name: "desktop-1280",
-      use: {
-        ...devices["Desktop Chrome"],
-        viewport: { width: 1280, height: 800 },
-      },
-    },
-    {
-      name: "wide-1440",
-      use: {
-        ...devices["Desktop Chrome"],
-        viewport: { width: 1440, height: 900 },
-      },
-    },
-  ],
-  webServer: externalBaseUrl
-    ? undefined
-    : {
-        command: `npm run dev -- --hostname 127.0.0.1 --port ${port}`,
-        url: baseURL,
-        reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
-      },
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  // Tests run against the production build, not the dev server.
+  webServer: {
+    // CONTENT_FIXTURES swaps the blog collection for tests/fixtures/blog (never used for real builds).
+    command: `CONTENT_FIXTURES=1 pnpm build && pnpm preview --port ${PORT}`,
+    url: `http://localhost:${PORT}`,
+    reuseExistingServer: false,
+    timeout: 180_000,
+  },
 });
