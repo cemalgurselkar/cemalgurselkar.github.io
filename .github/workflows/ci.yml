@@ -12,6 +12,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: portfolio-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -57,6 +61,9 @@ jobs:
           if-no-files-found: ignore
 
       - name: Build production project
+        env:
+          SITE_URL: https://cemalgurselkar.github.io
+          BASE_PATH: /
         run: pnpm build
 
       - name: Upload production build
@@ -66,3 +73,29 @@ jobs:
           path: dist/
           retention-days: 7
           if-no-files-found: error
+      - name: Upload GitHub Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4
